@@ -1,0 +1,2274 @@
+[
+  {
+    "model": "warehouse.warehouse",
+    "pk": 1,
+    "fields": {
+      "name": "Склад А — Москва",
+      "address": "г. Москва, ул. Складская, 1",
+      "config": {
+        "timezone": "Europe/Moscow"
+      },
+      "created_at": "2026-03-01T08:00:00+03:00"
+    }
+  },
+  {
+    "model": "warehouse.warehouse",
+    "pk": 2,
+    "fields": {
+      "name": "Склад B — Санкт-Петербург",
+      "address": "г. Санкт-Петербург, пр. Логистический, 7",
+      "config": {
+        "timezone": "Europe/Moscow"
+      },
+      "created_at": "2026-03-01T08:05:00+03:00"
+    }
+  },
+  {
+    "model": "warehouse.zone",
+    "pk": 1,
+    "fields": {
+      "warehouse": 1,
+      "name": "A-Picking",
+      "zone_type": "picking"
+    }
+  },
+  {
+    "model": "warehouse.zone",
+    "pk": 2,
+    "fields": {
+      "warehouse": 1,
+      "name": "A-Storage",
+      "zone_type": "storage"
+    }
+  },
+  {
+    "model": "warehouse.zone",
+    "pk": 3,
+    "fields": {
+      "warehouse": 1,
+      "name": "A-Shipping",
+      "zone_type": "shipping"
+    }
+  },
+  {
+    "model": "warehouse.zone",
+    "pk": 4,
+    "fields": {
+      "warehouse": 2,
+      "name": "B-Picking",
+      "zone_type": "picking"
+    }
+  },
+  {
+    "model": "warehouse.zone",
+    "pk": 5,
+    "fields": {
+      "warehouse": 2,
+      "name": "B-Storage",
+      "zone_type": "storage"
+    }
+  },
+  {
+    "model": "warehouse.zone",
+    "pk": 6,
+    "fields": {
+      "warehouse": 2,
+      "name": "B-Shipping",
+      "zone_type": "shipping"
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 1,
+    "fields": {
+      "zone": 1,
+      "barcode": "A-Picking-001",
+      "coords": {
+        "aisle": 1,
+        "rack": 2,
+        "level": 2,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 2,
+    "fields": {
+      "zone": 1,
+      "barcode": "A-Picking-002",
+      "coords": {
+        "aisle": 2,
+        "rack": 3,
+        "level": 3,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 3,
+    "fields": {
+      "zone": 1,
+      "barcode": "A-Picking-003",
+      "coords": {
+        "aisle": 3,
+        "rack": 4,
+        "level": 1,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 4,
+    "fields": {
+      "zone": 1,
+      "barcode": "A-Picking-004",
+      "coords": {
+        "aisle": 4,
+        "rack": 1,
+        "level": 2,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 5,
+    "fields": {
+      "zone": 1,
+      "barcode": "A-Picking-005",
+      "coords": {
+        "aisle": 5,
+        "rack": 2,
+        "level": 3,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 6,
+    "fields": {
+      "zone": 1,
+      "barcode": "A-Picking-006",
+      "coords": {
+        "aisle": 6,
+        "rack": 3,
+        "level": 1,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 7,
+    "fields": {
+      "zone": 1,
+      "barcode": "A-Picking-007",
+      "coords": {
+        "aisle": 7,
+        "rack": 4,
+        "level": 2,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 8,
+    "fields": {
+      "zone": 1,
+      "barcode": "A-Picking-008",
+      "coords": {
+        "aisle": 8,
+        "rack": 1,
+        "level": 3,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 9,
+    "fields": {
+      "zone": 2,
+      "barcode": "A-Storage-001",
+      "coords": {
+        "aisle": 1,
+        "rack": 2,
+        "level": 2,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 10,
+    "fields": {
+      "zone": 2,
+      "barcode": "A-Storage-002",
+      "coords": {
+        "aisle": 2,
+        "rack": 3,
+        "level": 3,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 11,
+    "fields": {
+      "zone": 2,
+      "barcode": "A-Storage-003",
+      "coords": {
+        "aisle": 3,
+        "rack": 4,
+        "level": 1,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 12,
+    "fields": {
+      "zone": 2,
+      "barcode": "A-Storage-004",
+      "coords": {
+        "aisle": 4,
+        "rack": 1,
+        "level": 2,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 13,
+    "fields": {
+      "zone": 2,
+      "barcode": "A-Storage-005",
+      "coords": {
+        "aisle": 5,
+        "rack": 2,
+        "level": 3,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 14,
+    "fields": {
+      "zone": 2,
+      "barcode": "A-Storage-006",
+      "coords": {
+        "aisle": 6,
+        "rack": 3,
+        "level": 1,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 15,
+    "fields": {
+      "zone": 2,
+      "barcode": "A-Storage-007",
+      "coords": {
+        "aisle": 7,
+        "rack": 4,
+        "level": 2,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 16,
+    "fields": {
+      "zone": 2,
+      "barcode": "A-Storage-008",
+      "coords": {
+        "aisle": 8,
+        "rack": 1,
+        "level": 3,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 17,
+    "fields": {
+      "zone": 3,
+      "barcode": "A-Shipping-001",
+      "coords": {
+        "aisle": 1,
+        "rack": 2,
+        "level": 2,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 18,
+    "fields": {
+      "zone": 3,
+      "barcode": "A-Shipping-002",
+      "coords": {
+        "aisle": 2,
+        "rack": 3,
+        "level": 3,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 19,
+    "fields": {
+      "zone": 3,
+      "barcode": "A-Shipping-003",
+      "coords": {
+        "aisle": 3,
+        "rack": 4,
+        "level": 1,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 20,
+    "fields": {
+      "zone": 3,
+      "barcode": "A-Shipping-004",
+      "coords": {
+        "aisle": 4,
+        "rack": 1,
+        "level": 2,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 21,
+    "fields": {
+      "zone": 3,
+      "barcode": "A-Shipping-005",
+      "coords": {
+        "aisle": 5,
+        "rack": 2,
+        "level": 3,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 22,
+    "fields": {
+      "zone": 3,
+      "barcode": "A-Shipping-006",
+      "coords": {
+        "aisle": 6,
+        "rack": 3,
+        "level": 1,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 23,
+    "fields": {
+      "zone": 3,
+      "barcode": "A-Shipping-007",
+      "coords": {
+        "aisle": 7,
+        "rack": 4,
+        "level": 2,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 24,
+    "fields": {
+      "zone": 3,
+      "barcode": "A-Shipping-008",
+      "coords": {
+        "aisle": 8,
+        "rack": 1,
+        "level": 3,
+        "warehouse": 1
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 25,
+    "fields": {
+      "zone": 4,
+      "barcode": "B-Picking-001",
+      "coords": {
+        "aisle": 1,
+        "rack": 2,
+        "level": 2,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 26,
+    "fields": {
+      "zone": 4,
+      "barcode": "B-Picking-002",
+      "coords": {
+        "aisle": 2,
+        "rack": 3,
+        "level": 3,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 27,
+    "fields": {
+      "zone": 4,
+      "barcode": "B-Picking-003",
+      "coords": {
+        "aisle": 3,
+        "rack": 4,
+        "level": 1,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 28,
+    "fields": {
+      "zone": 4,
+      "barcode": "B-Picking-004",
+      "coords": {
+        "aisle": 4,
+        "rack": 1,
+        "level": 2,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 29,
+    "fields": {
+      "zone": 4,
+      "barcode": "B-Picking-005",
+      "coords": {
+        "aisle": 5,
+        "rack": 2,
+        "level": 3,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 30,
+    "fields": {
+      "zone": 4,
+      "barcode": "B-Picking-006",
+      "coords": {
+        "aisle": 6,
+        "rack": 3,
+        "level": 1,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 31,
+    "fields": {
+      "zone": 4,
+      "barcode": "B-Picking-007",
+      "coords": {
+        "aisle": 7,
+        "rack": 4,
+        "level": 2,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 32,
+    "fields": {
+      "zone": 4,
+      "barcode": "B-Picking-008",
+      "coords": {
+        "aisle": 8,
+        "rack": 1,
+        "level": 3,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 33,
+    "fields": {
+      "zone": 5,
+      "barcode": "B-Storage-001",
+      "coords": {
+        "aisle": 1,
+        "rack": 2,
+        "level": 2,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 34,
+    "fields": {
+      "zone": 5,
+      "barcode": "B-Storage-002",
+      "coords": {
+        "aisle": 2,
+        "rack": 3,
+        "level": 3,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 35,
+    "fields": {
+      "zone": 5,
+      "barcode": "B-Storage-003",
+      "coords": {
+        "aisle": 3,
+        "rack": 4,
+        "level": 1,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 36,
+    "fields": {
+      "zone": 5,
+      "barcode": "B-Storage-004",
+      "coords": {
+        "aisle": 4,
+        "rack": 1,
+        "level": 2,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 37,
+    "fields": {
+      "zone": 5,
+      "barcode": "B-Storage-005",
+      "coords": {
+        "aisle": 5,
+        "rack": 2,
+        "level": 3,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 38,
+    "fields": {
+      "zone": 5,
+      "barcode": "B-Storage-006",
+      "coords": {
+        "aisle": 6,
+        "rack": 3,
+        "level": 1,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 39,
+    "fields": {
+      "zone": 5,
+      "barcode": "B-Storage-007",
+      "coords": {
+        "aisle": 7,
+        "rack": 4,
+        "level": 2,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 40,
+    "fields": {
+      "zone": 5,
+      "barcode": "B-Storage-008",
+      "coords": {
+        "aisle": 8,
+        "rack": 1,
+        "level": 3,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 41,
+    "fields": {
+      "zone": 5,
+      "barcode": "B-Storage-009",
+      "coords": {
+        "aisle": 9,
+        "rack": 2,
+        "level": 1,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 42,
+    "fields": {
+      "zone": 6,
+      "barcode": "B-Shipping-001",
+      "coords": {
+        "aisle": 1,
+        "rack": 2,
+        "level": 2,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 43,
+    "fields": {
+      "zone": 6,
+      "barcode": "B-Shipping-002",
+      "coords": {
+        "aisle": 2,
+        "rack": 3,
+        "level": 3,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 44,
+    "fields": {
+      "zone": 6,
+      "barcode": "B-Shipping-003",
+      "coords": {
+        "aisle": 3,
+        "rack": 4,
+        "level": 1,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 45,
+    "fields": {
+      "zone": 6,
+      "barcode": "B-Shipping-004",
+      "coords": {
+        "aisle": 4,
+        "rack": 1,
+        "level": 2,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 46,
+    "fields": {
+      "zone": 6,
+      "barcode": "B-Shipping-005",
+      "coords": {
+        "aisle": 5,
+        "rack": 2,
+        "level": 3,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 47,
+    "fields": {
+      "zone": 6,
+      "barcode": "B-Shipping-006",
+      "coords": {
+        "aisle": 6,
+        "rack": 3,
+        "level": 1,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 48,
+    "fields": {
+      "zone": 6,
+      "barcode": "B-Shipping-007",
+      "coords": {
+        "aisle": 7,
+        "rack": 4,
+        "level": 2,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 49,
+    "fields": {
+      "zone": 6,
+      "barcode": "B-Shipping-008",
+      "coords": {
+        "aisle": 8,
+        "rack": 1,
+        "level": 3,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "warehouse.location",
+    "pk": 50,
+    "fields": {
+      "zone": 6,
+      "barcode": "B-Shipping-009",
+      "coords": {
+        "aisle": 9,
+        "rack": 2,
+        "level": 1,
+        "warehouse": 2
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 1,
+    "fields": {
+      "sku": "SKU-001",
+      "name": "Товар 001",
+      "barcode": "460000000001",
+      "unit": "pcs",
+      "weight": "1.100",
+      "dimensions": {
+        "l": 11,
+        "w": 6,
+        "h": 4
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 2,
+    "fields": {
+      "sku": "SKU-002",
+      "name": "Товар 002",
+      "barcode": "460000000002",
+      "unit": "pcs",
+      "weight": "1.200",
+      "dimensions": {
+        "l": 12,
+        "w": 7,
+        "h": 5
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 3,
+    "fields": {
+      "sku": "SKU-003",
+      "name": "Товар 003",
+      "barcode": "460000000003",
+      "unit": "pcs",
+      "weight": "1.300",
+      "dimensions": {
+        "l": 13,
+        "w": 8,
+        "h": 6
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 4,
+    "fields": {
+      "sku": "SKU-004",
+      "name": "Товар 004",
+      "barcode": "460000000004",
+      "unit": "pcs",
+      "weight": "1.400",
+      "dimensions": {
+        "l": 14,
+        "w": 9,
+        "h": 7
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 5,
+    "fields": {
+      "sku": "SKU-005",
+      "name": "Товар 005",
+      "barcode": "460000000005",
+      "unit": "pcs",
+      "weight": "1.500",
+      "dimensions": {
+        "l": 15,
+        "w": 10,
+        "h": 8
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 6,
+    "fields": {
+      "sku": "SKU-006",
+      "name": "Товар 006",
+      "barcode": "460000000006",
+      "unit": "pcs",
+      "weight": "1.600",
+      "dimensions": {
+        "l": 16,
+        "w": 11,
+        "h": 9
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 7,
+    "fields": {
+      "sku": "SKU-007",
+      "name": "Товар 007",
+      "barcode": "460000000007",
+      "unit": "pcs",
+      "weight": "1.700",
+      "dimensions": {
+        "l": 17,
+        "w": 12,
+        "h": 10
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 8,
+    "fields": {
+      "sku": "SKU-008",
+      "name": "Товар 008",
+      "barcode": "460000000008",
+      "unit": "pcs",
+      "weight": "1.800",
+      "dimensions": {
+        "l": 18,
+        "w": 13,
+        "h": 11
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 9,
+    "fields": {
+      "sku": "SKU-009",
+      "name": "Товар 009",
+      "barcode": "460000000009",
+      "unit": "pcs",
+      "weight": "1.900",
+      "dimensions": {
+        "l": 19,
+        "w": 14,
+        "h": 12
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 10,
+    "fields": {
+      "sku": "SKU-010",
+      "name": "Товар 010",
+      "barcode": "460000000010",
+      "unit": "pcs",
+      "weight": "2.000",
+      "dimensions": {
+        "l": 20,
+        "w": 15,
+        "h": 13
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 11,
+    "fields": {
+      "sku": "SKU-011",
+      "name": "Товар 011",
+      "barcode": "460000000011",
+      "unit": "pcs",
+      "weight": "2.100",
+      "dimensions": {
+        "l": 21,
+        "w": 16,
+        "h": 14
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 12,
+    "fields": {
+      "sku": "SKU-012",
+      "name": "Товар 012",
+      "barcode": "460000000012",
+      "unit": "pcs",
+      "weight": "2.200",
+      "dimensions": {
+        "l": 22,
+        "w": 17,
+        "h": 15
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 13,
+    "fields": {
+      "sku": "SKU-013",
+      "name": "Товар 013",
+      "barcode": "460000000013",
+      "unit": "pcs",
+      "weight": "2.300",
+      "dimensions": {
+        "l": 23,
+        "w": 18,
+        "h": 16
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 14,
+    "fields": {
+      "sku": "SKU-014",
+      "name": "Товар 014",
+      "barcode": "460000000014",
+      "unit": "pcs",
+      "weight": "2.400",
+      "dimensions": {
+        "l": 24,
+        "w": 19,
+        "h": 17
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 15,
+    "fields": {
+      "sku": "SKU-015",
+      "name": "Товар 015",
+      "barcode": "460000000015",
+      "unit": "pcs",
+      "weight": "2.500",
+      "dimensions": {
+        "l": 25,
+        "w": 20,
+        "h": 18
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 16,
+    "fields": {
+      "sku": "SKU-016",
+      "name": "Товар 016",
+      "barcode": "460000000016",
+      "unit": "pcs",
+      "weight": "2.600",
+      "dimensions": {
+        "l": 26,
+        "w": 21,
+        "h": 19
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 17,
+    "fields": {
+      "sku": "SKU-017",
+      "name": "Товар 017",
+      "barcode": "460000000017",
+      "unit": "pcs",
+      "weight": "2.700",
+      "dimensions": {
+        "l": 27,
+        "w": 22,
+        "h": 20
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 18,
+    "fields": {
+      "sku": "SKU-018",
+      "name": "Товар 018",
+      "barcode": "460000000018",
+      "unit": "pcs",
+      "weight": "2.800",
+      "dimensions": {
+        "l": 28,
+        "w": 23,
+        "h": 21
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 19,
+    "fields": {
+      "sku": "SKU-019",
+      "name": "Товар 019",
+      "barcode": "460000000019",
+      "unit": "pcs",
+      "weight": "2.900",
+      "dimensions": {
+        "l": 29,
+        "w": 24,
+        "h": 22
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.item",
+    "pk": 20,
+    "fields": {
+      "sku": "SKU-020",
+      "name": "Товар 020",
+      "barcode": "460000000020",
+      "unit": "pcs",
+      "weight": "3.000",
+      "dimensions": {
+        "l": 30,
+        "w": 25,
+        "h": 23
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 1,
+    "fields": {
+      "item": 1,
+      "location": 1,
+      "quantity": "105.000",
+      "reserved_qty": "1.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 2,
+    "fields": {
+      "item": 2,
+      "location": 2,
+      "quantity": "110.000",
+      "reserved_qty": "2.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 3,
+    "fields": {
+      "item": 3,
+      "location": 3,
+      "quantity": "115.000",
+      "reserved_qty": "3.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 4,
+    "fields": {
+      "item": 4,
+      "location": 4,
+      "quantity": "120.000",
+      "reserved_qty": "4.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 5,
+    "fields": {
+      "item": 5,
+      "location": 5,
+      "quantity": "125.000",
+      "reserved_qty": "5.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 6,
+    "fields": {
+      "item": 6,
+      "location": 6,
+      "quantity": "130.000",
+      "reserved_qty": "6.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 7,
+    "fields": {
+      "item": 7,
+      "location": 7,
+      "quantity": "135.000",
+      "reserved_qty": "0.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 8,
+    "fields": {
+      "item": 8,
+      "location": 8,
+      "quantity": "140.000",
+      "reserved_qty": "1.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 9,
+    "fields": {
+      "item": 9,
+      "location": 9,
+      "quantity": "145.000",
+      "reserved_qty": "2.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 10,
+    "fields": {
+      "item": 10,
+      "location": 10,
+      "quantity": "150.000",
+      "reserved_qty": "3.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 11,
+    "fields": {
+      "item": 11,
+      "location": 11,
+      "quantity": "155.000",
+      "reserved_qty": "4.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 12,
+    "fields": {
+      "item": 12,
+      "location": 12,
+      "quantity": "160.000",
+      "reserved_qty": "5.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 13,
+    "fields": {
+      "item": 13,
+      "location": 13,
+      "quantity": "165.000",
+      "reserved_qty": "6.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 14,
+    "fields": {
+      "item": 14,
+      "location": 14,
+      "quantity": "170.000",
+      "reserved_qty": "0.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 15,
+    "fields": {
+      "item": 15,
+      "location": 15,
+      "quantity": "175.000",
+      "reserved_qty": "1.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 16,
+    "fields": {
+      "item": 16,
+      "location": 16,
+      "quantity": "180.000",
+      "reserved_qty": "2.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 17,
+    "fields": {
+      "item": 17,
+      "location": 17,
+      "quantity": "185.000",
+      "reserved_qty": "3.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 18,
+    "fields": {
+      "item": 18,
+      "location": 18,
+      "quantity": "190.000",
+      "reserved_qty": "4.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 19,
+    "fields": {
+      "item": 19,
+      "location": 19,
+      "quantity": "195.000",
+      "reserved_qty": "5.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "inventory.inventory",
+    "pk": 20,
+    "fields": {
+      "item": 20,
+      "location": 20,
+      "quantity": "200.000",
+      "reserved_qty": "6.000",
+      "updated_at": "2026-03-02T09:00:00+03:00"
+    }
+  },
+  {
+    "model": "operations.wave",
+    "pk": 1,
+    "fields": {
+      "warehouse": 1,
+      "code": "WAVE-001",
+      "status": "active",
+      "scheduled_at": "2026-03-03T09:00:00+03:00",
+      "created_at": "2026-03-03T08:50:00+03:00"
+    }
+  },
+  {
+    "model": "operations.wave",
+    "pk": 2,
+    "fields": {
+      "warehouse": 2,
+      "code": "WAVE-002",
+      "status": "planned",
+      "scheduled_at": "2026-03-03T11:00:00+03:00",
+      "created_at": "2026-03-03T10:50:00+03:00"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$seed-1$CkXEz9sNamhzzFnabGWBwEH7WQ4erNk98E1fCP/jS58=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "Admin",
+      "last_name": "Seed",
+      "email": "admin@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-03-01T07:30:00+03:00",
+      "role": "admin",
+      "warehouse": null,
+      "pin_code": "1111",
+      "shift": "A",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$seed-2$7cRM2QwqV3IUJZzGhxoe2hScKjCzS6kan7G0nMLKRoQ=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "manager",
+      "first_name": "Manager",
+      "last_name": "Seed",
+      "email": "manager@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-03-01T07:30:00+03:00",
+      "role": "manager",
+      "warehouse": 1,
+      "pin_code": "2222",
+      "shift": "A",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$seed-3$oGS+BKnMKoxV7pJH8LzIEKw8MKTFbdmbeHa+wUb7Bqs=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "supervisor",
+      "first_name": "Supervisor",
+      "last_name": "Seed",
+      "email": "supervisor@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-03-01T07:30:00+03:00",
+      "role": "supervisor",
+      "warehouse": 1,
+      "pin_code": "3333",
+      "shift": "B",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$seed-4$yOE8lCDL4fdSpIAKnON3hqicuv60CHyemQpw27TszbU=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "worker",
+      "first_name": "Worker",
+      "last_name": "Seed",
+      "email": "worker@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-03-01T07:30:00+03:00",
+      "role": "worker",
+      "warehouse": 2,
+      "pin_code": "4444",
+      "shift": "B",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.rbacpermission",
+    "pk": 1,
+    "fields": {
+      "role": "admin",
+      "resource": "order",
+      "action": "delete"
+    }
+  },
+  {
+    "model": "accounts.rbacpermission",
+    "pk": 2,
+    "fields": {
+      "role": "admin",
+      "resource": "user",
+      "action": "write"
+    }
+  },
+  {
+    "model": "accounts.rbacpermission",
+    "pk": 3,
+    "fields": {
+      "role": "manager",
+      "resource": "order",
+      "action": "write"
+    }
+  },
+  {
+    "model": "accounts.rbacpermission",
+    "pk": 4,
+    "fields": {
+      "role": "manager",
+      "resource": "kpi",
+      "action": "read"
+    }
+  },
+  {
+    "model": "accounts.rbacpermission",
+    "pk": 5,
+    "fields": {
+      "role": "supervisor",
+      "resource": "task",
+      "action": "write"
+    }
+  },
+  {
+    "model": "accounts.rbacpermission",
+    "pk": 6,
+    "fields": {
+      "role": "supervisor",
+      "resource": "order",
+      "action": "read"
+    }
+  },
+  {
+    "model": "accounts.rbacpermission",
+    "pk": 7,
+    "fields": {
+      "role": "worker",
+      "resource": "task",
+      "action": "read"
+    }
+  },
+  {
+    "model": "accounts.rbacpermission",
+    "pk": 8,
+    "fields": {
+      "role": "worker",
+      "resource": "inventory",
+      "action": "read"
+    }
+  },
+  {
+    "model": "orders.order",
+    "pk": 1,
+    "fields": {
+      "warehouse": 1,
+      "wave": null,
+      "status": "pending",
+      "priority": 1,
+      "customer": "ООО Альфа",
+      "deadline": "2026-03-03T18:00:00+03:00",
+      "created_at": "2026-03-03T08:00:00+03:00",
+      "updated_at": "2026-03-03T08:30:00+03:00"
+    }
+  },
+  {
+    "model": "orders.order",
+    "pk": 2,
+    "fields": {
+      "warehouse": 1,
+      "wave": null,
+      "status": "processing",
+      "priority": 3,
+      "customer": "ООО Бета",
+      "deadline": "2026-03-03T19:00:00+03:00",
+      "created_at": "2026-03-03T08:00:00+03:00",
+      "updated_at": "2026-03-03T08:30:00+03:00"
+    }
+  },
+  {
+    "model": "orders.order",
+    "pk": 3,
+    "fields": {
+      "warehouse": 1,
+      "wave": 1,
+      "status": "picking",
+      "priority": 2,
+      "customer": "ООО Гамма",
+      "deadline": "2026-03-03T17:00:00+03:00",
+      "created_at": "2026-03-03T08:00:00+03:00",
+      "updated_at": "2026-03-03T08:30:00+03:00"
+    }
+  },
+  {
+    "model": "orders.order",
+    "pk": 4,
+    "fields": {
+      "warehouse": 2,
+      "wave": 2,
+      "status": "packed",
+      "priority": 4,
+      "customer": "ООО Дельта",
+      "deadline": "2026-03-04T09:00:00+03:00",
+      "created_at": "2026-03-03T08:00:00+03:00",
+      "updated_at": "2026-03-03T08:30:00+03:00"
+    }
+  },
+  {
+    "model": "orders.order",
+    "pk": 5,
+    "fields": {
+      "warehouse": 2,
+      "wave": 2,
+      "status": "done",
+      "priority": 5,
+      "customer": "ООО Эпсилон",
+      "deadline": "2026-03-02T12:00:00+03:00",
+      "created_at": "2026-03-03T08:00:00+03:00",
+      "updated_at": "2026-03-03T08:30:00+03:00"
+    }
+  },
+  {
+    "model": "orders.orderline",
+    "pk": 1,
+    "fields": {
+      "order": 1,
+      "item": 1,
+      "location": 1,
+      "qty_req": "4.000",
+      "qty_picked": "0.000"
+    }
+  },
+  {
+    "model": "orders.orderline",
+    "pk": 2,
+    "fields": {
+      "order": 1,
+      "item": 2,
+      "location": 2,
+      "qty_req": "3.000",
+      "qty_picked": "0.000"
+    }
+  },
+  {
+    "model": "orders.orderline",
+    "pk": 3,
+    "fields": {
+      "order": 2,
+      "item": 3,
+      "location": 3,
+      "qty_req": "5.000",
+      "qty_picked": "1.000"
+    }
+  },
+  {
+    "model": "orders.orderline",
+    "pk": 4,
+    "fields": {
+      "order": 2,
+      "item": 4,
+      "location": 4,
+      "qty_req": "6.000",
+      "qty_picked": "1.000"
+    }
+  },
+  {
+    "model": "orders.orderline",
+    "pk": 5,
+    "fields": {
+      "order": 3,
+      "item": 5,
+      "location": 5,
+      "qty_req": "2.000",
+      "qty_picked": "2.000"
+    }
+  },
+  {
+    "model": "orders.orderline",
+    "pk": 6,
+    "fields": {
+      "order": 3,
+      "item": 6,
+      "location": 6,
+      "qty_req": "1.000",
+      "qty_picked": "1.000"
+    }
+  },
+  {
+    "model": "orders.orderline",
+    "pk": 7,
+    "fields": {
+      "order": 4,
+      "item": 7,
+      "location": 25,
+      "qty_req": "7.000",
+      "qty_picked": "7.000"
+    }
+  },
+  {
+    "model": "orders.orderline",
+    "pk": 8,
+    "fields": {
+      "order": 4,
+      "item": 8,
+      "location": 26,
+      "qty_req": "2.000",
+      "qty_picked": "2.000"
+    }
+  },
+  {
+    "model": "orders.orderline",
+    "pk": 9,
+    "fields": {
+      "order": 5,
+      "item": 9,
+      "location": 27,
+      "qty_req": "9.000",
+      "qty_picked": "9.000"
+    }
+  },
+  {
+    "model": "orders.orderline",
+    "pk": 10,
+    "fields": {
+      "order": 5,
+      "item": 10,
+      "location": 28,
+      "qty_req": "4.000",
+      "qty_picked": "4.000"
+    }
+  },
+  {
+    "model": "operations.task",
+    "pk": 1,
+    "fields": {
+      "warehouse": 1,
+      "wave": 1,
+      "assignee": 4,
+      "task_type": "picking",
+      "status": "assigned",
+      "source_location": 1,
+      "target_location": 17,
+      "quantity": "4.000",
+      "priority": 1,
+      "created_at": "2026-03-03T09:00:00+03:00",
+      "assigned_at": "2026-03-03T09:05:00+03:00",
+      "completed_at": null
+    }
+  },
+  {
+    "model": "operations.task",
+    "pk": 2,
+    "fields": {
+      "warehouse": 1,
+      "wave": 1,
+      "assignee": 4,
+      "task_type": "picking",
+      "status": "in_progress",
+      "source_location": 2,
+      "target_location": 18,
+      "quantity": "3.000",
+      "priority": 2,
+      "created_at": "2026-03-03T09:00:00+03:00",
+      "assigned_at": "2026-03-03T09:05:00+03:00",
+      "completed_at": null
+    }
+  },
+  {
+    "model": "operations.task",
+    "pk": 3,
+    "fields": {
+      "warehouse": 1,
+      "wave": 1,
+      "assignee": 4,
+      "task_type": "move",
+      "status": "pending",
+      "source_location": 5,
+      "target_location": 19,
+      "quantity": "2.000",
+      "priority": 3,
+      "created_at": "2026-03-03T09:00:00+03:00",
+      "assigned_at": "2026-03-03T09:05:00+03:00",
+      "completed_at": null
+    }
+  },
+  {
+    "model": "operations.task",
+    "pk": 4,
+    "fields": {
+      "warehouse": 2,
+      "wave": 2,
+      "assignee": 4,
+      "task_type": "shipping",
+      "status": "assigned",
+      "source_location": 25,
+      "target_location": 42,
+      "quantity": "7.000",
+      "priority": 4,
+      "created_at": "2026-03-03T09:00:00+03:00",
+      "assigned_at": "2026-03-03T09:05:00+03:00",
+      "completed_at": null
+    }
+  },
+  {
+    "model": "operations.task",
+    "pk": 5,
+    "fields": {
+      "warehouse": 2,
+      "wave": 2,
+      "assignee": 4,
+      "task_type": "putaway",
+      "status": "done",
+      "source_location": 33,
+      "target_location": 34,
+      "quantity": "9.000",
+      "priority": 5,
+      "created_at": "2026-03-03T09:00:00+03:00",
+      "assigned_at": "2026-03-03T09:05:00+03:00",
+      "completed_at": "2026-03-03T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "operations.taskstep",
+    "pk": 1,
+    "fields": {
+      "task": 1,
+      "sequence": 1,
+      "action": "scan-source",
+      "location": 1,
+      "expected_barcode": "LOC-001",
+      "expected_qty": "1.000",
+      "actual_qty": "0.000",
+      "completed_at": null,
+      "metadata": {
+        "task_id": 1
+      }
+    }
+  },
+  {
+    "model": "operations.taskstep",
+    "pk": 2,
+    "fields": {
+      "task": 1,
+      "sequence": 2,
+      "action": "confirm-target",
+      "location": 17,
+      "expected_barcode": "LOC-017",
+      "expected_qty": "1.000",
+      "actual_qty": "0.000",
+      "completed_at": null,
+      "metadata": {
+        "task_id": 1
+      }
+    }
+  },
+  {
+    "model": "operations.taskstep",
+    "pk": 3,
+    "fields": {
+      "task": 2,
+      "sequence": 1,
+      "action": "scan-source",
+      "location": 2,
+      "expected_barcode": "LOC-002",
+      "expected_qty": "1.000",
+      "actual_qty": "0.000",
+      "completed_at": null,
+      "metadata": {
+        "task_id": 2
+      }
+    }
+  },
+  {
+    "model": "operations.taskstep",
+    "pk": 4,
+    "fields": {
+      "task": 2,
+      "sequence": 2,
+      "action": "confirm-target",
+      "location": 18,
+      "expected_barcode": "LOC-018",
+      "expected_qty": "1.000",
+      "actual_qty": "0.000",
+      "completed_at": null,
+      "metadata": {
+        "task_id": 2
+      }
+    }
+  },
+  {
+    "model": "operations.taskstep",
+    "pk": 5,
+    "fields": {
+      "task": 3,
+      "sequence": 1,
+      "action": "scan-source",
+      "location": 5,
+      "expected_barcode": "LOC-005",
+      "expected_qty": "1.000",
+      "actual_qty": "0.000",
+      "completed_at": null,
+      "metadata": {
+        "task_id": 3
+      }
+    }
+  },
+  {
+    "model": "operations.taskstep",
+    "pk": 6,
+    "fields": {
+      "task": 3,
+      "sequence": 2,
+      "action": "confirm-target",
+      "location": 19,
+      "expected_barcode": "LOC-019",
+      "expected_qty": "1.000",
+      "actual_qty": "0.000",
+      "completed_at": null,
+      "metadata": {
+        "task_id": 3
+      }
+    }
+  },
+  {
+    "model": "operations.taskstep",
+    "pk": 7,
+    "fields": {
+      "task": 4,
+      "sequence": 1,
+      "action": "scan-source",
+      "location": 25,
+      "expected_barcode": "LOC-025",
+      "expected_qty": "1.000",
+      "actual_qty": "0.000",
+      "completed_at": null,
+      "metadata": {
+        "task_id": 4
+      }
+    }
+  },
+  {
+    "model": "operations.taskstep",
+    "pk": 8,
+    "fields": {
+      "task": 4,
+      "sequence": 2,
+      "action": "confirm-target",
+      "location": 42,
+      "expected_barcode": "LOC-042",
+      "expected_qty": "1.000",
+      "actual_qty": "0.000",
+      "completed_at": null,
+      "metadata": {
+        "task_id": 4
+      }
+    }
+  },
+  {
+    "model": "operations.taskstep",
+    "pk": 9,
+    "fields": {
+      "task": 5,
+      "sequence": 1,
+      "action": "scan-source",
+      "location": 33,
+      "expected_barcode": "LOC-033",
+      "expected_qty": "1.000",
+      "actual_qty": "1.000",
+      "completed_at": null,
+      "metadata": {
+        "task_id": 5
+      }
+    }
+  },
+  {
+    "model": "operations.taskstep",
+    "pk": 10,
+    "fields": {
+      "task": 5,
+      "sequence": 2,
+      "action": "confirm-target",
+      "location": 34,
+      "expected_barcode": "LOC-034",
+      "expected_qty": "1.000",
+      "actual_qty": "1.000",
+      "completed_at": null,
+      "metadata": {
+        "task_id": 5
+      }
+    }
+  },
+  {
+    "model": "operations.route",
+    "pk": 1,
+    "fields": {
+      "wave": 1,
+      "task": 1,
+      "method": "nearest_neighbor",
+      "points": [
+        "A-Picking-001",
+        "A-Shipping-001"
+      ],
+      "distance_m": "124.50",
+      "eta_seconds": 320,
+      "diagnostics": {
+        "iterations": 2
+      },
+      "created_at": "2026-03-03T09:01:00+03:00"
+    }
+  },
+  {
+    "model": "operations.route",
+    "pk": 2,
+    "fields": {
+      "wave": 2,
+      "task": 4,
+      "method": "s_shape",
+      "points": [
+        "B-Picking-001",
+        "B-Shipping-001"
+      ],
+      "distance_m": "210.00",
+      "eta_seconds": 510,
+      "diagnostics": {
+        "iterations": 1
+      },
+      "created_at": "2026-03-03T11:01:00+03:00"
+    }
+  },
+  {
+    "model": "operations.integrationconfig",
+    "pk": 1,
+    "fields": {
+      "warehouse": 1,
+      "name": "1C Sync A",
+      "channel_type": "rest",
+      "direction": "pull",
+      "endpoint": "https://example.local/api/1c/a",
+      "schedule": "*/15 * * * *",
+      "settings": {
+        "timeout": 30
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "operations.integrationconfig",
+    "pk": 2,
+    "fields": {
+      "warehouse": 2,
+      "name": "SAP Push B",
+      "channel_type": "csv",
+      "direction": "push",
+      "endpoint": "/exports/b.csv",
+      "schedule": "0 * * * *",
+      "settings": {
+        "separator": ";"
+      },
+      "is_active": true
+    }
+  },
+  {
+    "model": "operations.integrationlog",
+    "pk": 1,
+    "fields": {
+      "config": 1,
+      "status": "success",
+      "attempt": 1,
+      "payload": {
+        "batch": "sync-a-001"
+      },
+      "response": {
+        "status": 200
+      },
+      "error_message": "",
+      "created_at": "2026-03-03T09:15:00+03:00"
+    }
+  },
+  {
+    "model": "operations.integrationlog",
+    "pk": 2,
+    "fields": {
+      "config": 2,
+      "status": "error",
+      "attempt": 2,
+      "payload": {
+        "batch": "push-b-001"
+      },
+      "response": {
+        "status": 500
+      },
+      "error_message": "Temporary upstream failure",
+      "created_at": "2026-03-03T10:15:00+03:00"
+    }
+  },
+  {
+    "model": "operations.kpisnapshot",
+    "pk": 1,
+    "fields": {
+      "warehouse": 1,
+      "shift": "A",
+      "period_start": "2026-03-03T08:00:00+03:00",
+      "period_end": "2026-03-03T16:00:00+03:00",
+      "throughput_lines": 120,
+      "throughput_orders": 45,
+      "order_accuracy": "98.50",
+      "dock_to_stock_p95": "42.30",
+      "sla_on_time": 39,
+      "sla_overdue": 6,
+      "active_minutes": 360,
+      "idle_minutes": 45,
+      "created_at": "2026-03-03T16:10:00+03:00"
+    }
+  },
+  {
+    "model": "operations.kpisnapshot",
+    "pk": 2,
+    "fields": {
+      "warehouse": 2,
+      "shift": "B",
+      "period_start": "2026-03-03T08:00:00+03:00",
+      "period_end": "2026-03-03T16:00:00+03:00",
+      "throughput_lines": 98,
+      "throughput_orders": 34,
+      "order_accuracy": "97.10",
+      "dock_to_stock_p95": "55.00",
+      "sla_on_time": 30,
+      "sla_overdue": 4,
+      "active_minutes": 330,
+      "idle_minutes": 60,
+      "created_at": "2026-03-03T16:10:00+03:00"
+    }
+  },
+  {
+    "model": "operations.event",
+    "pk": 1,
+    "fields": {
+      "warehouse": 1,
+      "user": 2,
+      "task": 1,
+      "event_type": "task_assigned",
+      "payload": {
+        "task_id": 1,
+        "source": "seed"
+      },
+      "created_at": "2026-03-03T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "operations.event",
+    "pk": 2,
+    "fields": {
+      "warehouse": 1,
+      "user": 3,
+      "task": 2,
+      "event_type": "task_started",
+      "payload": {
+        "task_id": 2,
+        "source": "seed"
+      },
+      "created_at": "2026-03-03T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "operations.event",
+    "pk": 3,
+    "fields": {
+      "warehouse": 1,
+      "user": 4,
+      "task": 3,
+      "event_type": "inventory_adjusted",
+      "payload": {
+        "task_id": 3,
+        "source": "seed"
+      },
+      "created_at": "2026-03-03T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "operations.event",
+    "pk": 4,
+    "fields": {
+      "warehouse": 2,
+      "user": 4,
+      "task": 4,
+      "event_type": "task_reprioritized",
+      "payload": {
+        "task_id": 4,
+        "source": "seed"
+      },
+      "created_at": "2026-03-03T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "operations.event",
+    "pk": 5,
+    "fields": {
+      "warehouse": 2,
+      "user": 4,
+      "task": 5,
+      "event_type": "task_completed",
+      "payload": {
+        "task_id": 5,
+        "source": "seed"
+      },
+      "created_at": "2026-03-03T10:00:00+03:00"
+    }
+  },
+  {
+    "model": "accounts.auditlog",
+    "pk": 1,
+    "fields": {
+      "user": 2,
+      "action": "create",
+      "entity_type": "order",
+      "entity_id": 1,
+      "details": {
+        "seed": true
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-03-03T10:30:00+03:00"
+    }
+  },
+  {
+    "model": "accounts.auditlog",
+    "pk": 2,
+    "fields": {
+      "user": 3,
+      "action": "assign",
+      "entity_type": "task",
+      "entity_id": 1,
+      "details": {
+        "seed": true
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-03-03T10:30:00+03:00"
+    }
+  },
+  {
+    "model": "accounts.auditlog",
+    "pk": 3,
+    "fields": {
+      "user": 4,
+      "action": "adjust",
+      "entity_type": "inventory",
+      "entity_id": 1,
+      "details": {
+        "seed": true
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-03-03T10:30:00+03:00"
+    }
+  }
+]

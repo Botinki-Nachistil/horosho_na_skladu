@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "warehouse-platform-django"
+version = "0.1.0"
+description = "Django data layer for warehouse logistics optimization platform"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "Django>=5.2,<5.3",
+  "psycopg[binary]>=3.2,<4",
+  "PyJWT>=2.10,<3",
+  "pydantic>=2.8,<3",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["accounts*", "config*", "inventory*", "operations*", "orders*", "shared*", "warehouse*"]
