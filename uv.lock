@@ -1,0 +1,25 @@
+version = 1
+revision = 3
+requires-python = ">=3.13"
+
+[manifest]
+members = [
+    "sklad-django-part",
+    "sklad-fastapi-part",
+    "sklad-flask-part",
+]
+
+[[package]]
+name = "sklad-django-part"
+version = "0.0.1"
+source = { virtual = "django_part" }
+
+[[package]]
+name = "sklad-fastapi-part"
+version = "0.0.1"
+source = { virtual = "fastapi_part" }
+
+[[package]]
+name = "sklad-flask-part"
+version = "0.0.1"
+source = { virtual = "flask_part" }

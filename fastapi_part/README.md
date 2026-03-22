@@ -1,1 +1,3 @@
-# horosho_na_skladu
+# Склад:= часть FastAPI
+
+Расписать функции

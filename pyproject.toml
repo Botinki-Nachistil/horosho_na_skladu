@@ -1,3 +1,10 @@
+[tool.uv.workspace]
+members = [
+    "sklad_django_part",
+    "sklad_fastapi_part",
+    "sklad_flask_part"
+]
+
 [tool.ruff]
 exclude = [
     ".git",

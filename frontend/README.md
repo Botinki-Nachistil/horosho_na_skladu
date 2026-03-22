@@ -1,1 +1,0 @@
-# horosho_na_skladu
