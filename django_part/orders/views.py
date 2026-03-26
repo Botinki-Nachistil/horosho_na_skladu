@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from shared.exceptions import InvalidStateError, ValidationError
 from orders.models import Order
 from orders.serializers import OrderSerializer
+from orders.services import transition_order
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -34,15 +35,5 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="transition")
     def transition(self, request, pk=None):
-        order = self.get_object()
-        target = request.data.get("status")
-
-        if not target:
-            raise ValidationError("status is required.")
-
-        if not order.can_transition_to(target):
-            raise InvalidStateError(f"Cannot transition from {order.status} to {target}.")
-
-        order.status = target
-        order.save(update_fields=["status", "updated_at"])
+        order = transition_order(self.get_object(), request.data.get("status"))
         return Response(OrderSerializer(order).data)
