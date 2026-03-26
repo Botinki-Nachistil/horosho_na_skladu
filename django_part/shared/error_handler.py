@@ -40,24 +40,48 @@ def unified_exception_handler(exc, context):
     if response is None:
         logger.error("unhandled_exception error=%s", str(exc), exc_info=True)
         return Response(
-            {"error": {"code": "INTERNAL_ERROR", "message": str(exc), "details": {}}},
-            status=500,
+            {
+                "error": {
+                    "code": exc.code,
+                    "message": exc.message,
+                    "details": exc.details,
+                }
+            },
+            status=exc.status_code,
         )
 
-    original = response.data
+    if response is not None:
+        original = response.data
 
-    if isinstance(original, dict) and "detail" in original:
-        code = getattr(original["detail"], "code", "ERROR").upper()
-        message = str(original["detail"])
-        details = {}
-    elif isinstance(original, dict):
-        code = "VALIDATION_ERROR"
-        message = "Validation failed."
-        details = original
-    else:
-        code = "ERROR"
-        message = str(original)
-        details = {}
+        if isinstance(original, dict) and "detail" in original:
+            code = getattr(original["detail"], "code", "ERROR").upper()
+            message = str(original["detail"])
+            details = {}
+        elif isinstance(original, dict):
+            code = "VALIDATION_ERROR"
+            message = "Validation failed."
+            details = original
+        else:
+            code = "ERROR"
+            message = str(original)
+            details = {}
 
-    response.data = {"error": {"code": code, "message": message, "details": details}}
-    return response
+        response.data = {
+            "error": {
+                "code": code,
+                "message": message,
+                "details": details,
+            }
+        }
+        return response
+
+    return Response(
+        {
+            "error": {
+                "code": "INTERNAL_ERROR",
+                "message": "An unexpected error occurred.",
+                "details": {},
+            }
+        },
+        status=500,
+    )
