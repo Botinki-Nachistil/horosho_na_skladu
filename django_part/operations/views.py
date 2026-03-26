@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from django.utils import timezone
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -23,6 +22,13 @@ from operations.serializers import (
     TaskSerializer,
     WaveSerializer,
 )
+from operations.services import (
+    activate_wave,
+    assign_task,
+    cancel_task,
+    complete_task,
+    start_task,
+)
 
 
 class WaveViewSet(viewsets.ModelViewSet):
@@ -41,19 +47,7 @@ class WaveViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="activate")
     def activate(self, request, pk=None):
-        wave = self.get_object()
-
-        if wave.status != Wave.Status.PLANNED:
-            return Response(
-                {"error": {
-                    "code": "INVALID_STATE",
-                    "message": f"Cannot activate wave with status {wave.status}.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
-
-        wave.status = Wave.Status.ACTIVE
-        wave.save(update_fields=["status"])
+        wave = activate_wave(self.get_object())
         return Response(WaveSerializer(wave).data)
 
 
@@ -89,82 +83,22 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="assign")
     def assign(self, request, pk=None):
-        task = self.get_object()
-
-        if task.status not in (Task.Status.PENDING, Task.Status.ASSIGNED):
-            return Response(
-                {"error": {
-                    "code": "INVALID_STATE",
-                    "message": f"Cannot assign task with status {task.status}.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
-
-        user_id = request.data.get("user_id")
-        try:
-            worker = User.objects.get(pk=user_id, role=User.Role.WORKER, is_active=True)
-        except User.DoesNotExist:
-            return Response(
-                {"error": {"code": "NOT_FOUND", "message": "Active worker not found."}},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        task.assignee = worker
-        task.status = Task.Status.ASSIGNED
-        task.assigned_at = timezone.now()
-        task.save(update_fields=["assignee", "status", "assigned_at"])
+        task = assign_task(self.get_object(), request.data.get("user_id"))
         return Response(TaskSerializer(task).data)
 
     @action(detail=True, methods=["post"], url_path="start")
     def start(self, request, pk=None):
-        task = self.get_object()
-
-        if task.status != Task.Status.ASSIGNED:
-            return Response(
-                {"error": {
-                    "code": "INVALID_STATE",
-                    "message": f"Cannot start task with status {task.status}.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
-
-        task.status = Task.Status.IN_PROGRESS
-        task.save(update_fields=["status"])
+        task = start_task(self.get_object())
         return Response(TaskSerializer(task).data)
 
     @action(detail=True, methods=["post"], url_path="complete")
     def complete(self, request, pk=None):
-        task = self.get_object()
-
-        if task.status != Task.Status.IN_PROGRESS:
-            return Response(
-                {"error": {
-                    "code": "INVALID_STATE",
-                    "message": f"Cannot complete task with status {task.status}.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
-
-        task.status = Task.Status.DONE
-        task.completed_at = timezone.now()
-        task.save(update_fields=["status", "completed_at"])
+        task = complete_task(self.get_object())
         return Response(TaskSerializer(task).data)
 
     @action(detail=True, methods=["post"], url_path="cancel")
     def cancel(self, request, pk=None):
-        task = self.get_object()
-
-        if task.status == Task.Status.DONE:
-            return Response(
-                {"error": {
-                    "code": "INVALID_STATE",
-                    "message": "Cannot cancel completed task.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
-
-        task.status = Task.Status.CANCELLED
-        task.save(update_fields=["status"])
+        task = cancel_task(self.get_object())
         return Response(TaskSerializer(task).data)
 
 

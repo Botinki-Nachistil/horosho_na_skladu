@@ -1,108 +1,42 @@
 from __future__ import annotations
 
-from django.contrib.auth import authenticate
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import AuditLog, User
 from accounts.serializers import AuditLogSerializer, UserCreateSerializer, UserSerializer
-
-
-def _make_token_response(user: User) -> dict:
-    refresh = RefreshToken.for_user(user)
-    refresh["role"] = user.role
-    refresh["warehouse_id"] = user.warehouse_id
-    return {
-        "access": str(refresh.access_token),
-        "refresh": str(refresh),
-        "user_id": user.id,
-        "role": user.role,
-        "warehouse_id": user.warehouse_id,
-    }
+from accounts.services import login_user, pin_login, refresh_token, set_user_active
 
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-
-        if not username or not password:
-            return Response(
-                {"error": {"code": "MISSING_FIELDS", "message": "username and password are required."}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        user = authenticate(request, username=username, password=password)
-
-        if not user:
-            return Response(
-                {"error": {"code": "INVALID_CREDENTIALS", "message": "Invalid username or password."}},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        if not user.is_active:
-            return Response(
-                {"error": {"code": "ACCOUNT_DISABLED", "message": "Account is disabled."}},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        return Response(_make_token_response(user))
+        return Response(login_user(
+            request.data.get("username"),
+            request.data.get("password"),
+            request,
+        ))
 
 
 class PinLoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        pin = request.data.get("pin_code", "")
-        warehouse_id = request.data.get("warehouse_id")
-
-        if not pin or not pin.isdigit() or not (4 <= len(pin) <= 6):
-            return Response(
-                {"error": {"code": "INVALID_PIN", "message": "PIN must be 4-6 digits."}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        qs = User.objects.filter(role=User.Role.WORKER, is_active=True)
-        if warehouse_id:
-            qs = qs.filter(warehouse_id=warehouse_id)
-
-        matched = next((u for u in qs if u.check_pin(pin)), None)
-
-        if not matched:
-            return Response(
-                {"error": {"code": "INVALID_PIN", "message": "Invalid PIN."}},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        return Response(_make_token_response(matched))
+        return Response(pin_login(
+            request.data.get("pin_code", ""),
+            request.data.get("warehouse_id"),
+        ))
 
 
 class RefreshView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        token = request.data.get("refresh")
-
-        if not token:
-            return Response(
-                {"error": {"code": "MISSING_FIELD", "message": "refresh token is required."}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        try:
-            refresh = RefreshToken(token)
-            return Response({"access": str(refresh.access_token)})
-        except Exception:
-            return Response(
-                {"error": {"code": "INVALID_TOKEN", "message": "Token is invalid or expired."}},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+        return Response(refresh_token(request.data.get("refresh")))
 
 
 class MeView(APIView):
@@ -133,16 +67,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="deactivate")
     def deactivate(self, request, pk=None):
-        user = self.get_object()
-        user.is_active = False
-        user.save(update_fields=["is_active"])
+        set_user_active(self.get_object(), False)
         return Response({"message": "User deactivated."})
 
     @action(detail=True, methods=["post"], url_path="activate")
     def activate(self, request, pk=None):
-        user = self.get_object()
-        user.is_active = True
-        user.save(update_fields=["is_active"])
+        set_user_active(self.get_object(), True)
         return Response({"message": "User activated."})
 
 
