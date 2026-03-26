@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from django.contrib.auth import authenticate
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from shared.exceptions import TokenValidationError, ValidationError
 from accounts.models import AuditLog, User
 from accounts.serializers import AuditLogSerializer, UserCreateSerializer, UserSerializer
 
@@ -33,18 +34,12 @@ class LoginView(APIView):
         password = request.data.get("password")
 
         if not username or not password:
-            return Response(
-                {"error": {"code": "MISSING_FIELDS", "message": "username and password are required."}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise ValidationError("username and password are required.")
 
         user = authenticate(request, username=username, password=password)
 
         if not user:
-            return Response(
-                {"error": {"code": "INVALID_CREDENTIALS", "message": "Invalid username or password."}},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+            raise TokenValidationError("Invalid username or password.")
 
         if not user.is_active:
             return Response(
@@ -63,10 +58,7 @@ class PinLoginView(APIView):
         warehouse_id = request.data.get("warehouse_id")
 
         if not pin or not pin.isdigit() or not (4 <= len(pin) <= 6):
-            return Response(
-                {"error": {"code": "INVALID_PIN", "message": "PIN must be 4-6 digits."}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise ValidationError("PIN must be 4-6 digits.")
 
         qs = User.objects.filter(role=User.Role.WORKER, is_active=True)
         if warehouse_id:
@@ -75,10 +67,7 @@ class PinLoginView(APIView):
         matched = next((u for u in qs if u.check_pin(pin)), None)
 
         if not matched:
-            return Response(
-                {"error": {"code": "INVALID_PIN", "message": "Invalid PIN."}},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+            raise TokenValidationError("Invalid PIN.")
 
         return Response(_make_token_response(matched))
 
@@ -90,19 +79,13 @@ class RefreshView(APIView):
         token = request.data.get("refresh")
 
         if not token:
-            return Response(
-                {"error": {"code": "MISSING_FIELD", "message": "refresh token is required."}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise ValidationError("refresh token is required.")
 
         try:
             refresh = RefreshToken(token)
             return Response({"access": str(refresh.access_token)})
         except Exception:
-            return Response(
-                {"error": {"code": "INVALID_TOKEN", "message": "Token is invalid or expired."}},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+            raise TokenValidationError("Token is invalid or expired.")
 
 
 class MeView(APIView):

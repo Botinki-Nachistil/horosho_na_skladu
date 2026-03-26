@@ -45,4 +45,4 @@ class LocationViewSet(viewsets.ModelViewSet):
             qs = qs.filter(zone_id=zone_id)
         if warehouse_id:
             qs = qs.filter(zone__warehouse_id=warehouse_id)
-        return qsv
+        return qs

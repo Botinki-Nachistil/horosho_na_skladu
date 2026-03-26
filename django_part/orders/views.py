@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from shared.exceptions import InvalidStateError, ValidationError
 from orders.models import Order
 from orders.serializers import OrderSerializer
 
@@ -37,19 +38,10 @@ class OrderViewSet(viewsets.ModelViewSet):
         target = request.data.get("status")
 
         if not target:
-            return Response(
-                {"error": {"code": "MISSING_FIELD", "message": "status is required."}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise ValidationError("status is required.")
 
         if not order.can_transition_to(target):
-            return Response(
-                {"error": {
-                    "code": "INVALID_TRANSITION",
-                    "message": f"Cannot transition from {order.status} to {target}.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
+            raise InvalidStateError(f"Cannot transition from {order.status} to {target}.")
 
         order.status = target
         order.save(update_fields=["status", "updated_at"])
