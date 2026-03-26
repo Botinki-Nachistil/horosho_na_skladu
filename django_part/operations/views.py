@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from django.utils import timezone
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from accounts.models import User
+from shared.exceptions import InvalidStateError, NotFoundError
 from operations.models import (
     IntegrationConfig,
     IntegrationLog,
@@ -44,13 +45,7 @@ class WaveViewSet(viewsets.ModelViewSet):
         wave = self.get_object()
 
         if wave.status != Wave.Status.PLANNED:
-            return Response(
-                {"error": {
-                    "code": "INVALID_STATE",
-                    "message": f"Cannot activate wave with status {wave.status}.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
+            raise InvalidStateError(f"Cannot activate wave with status {wave.status}.")
 
         wave.status = Wave.Status.ACTIVE
         wave.save(update_fields=["status"])
@@ -92,22 +87,13 @@ class TaskViewSet(viewsets.ModelViewSet):
         task = self.get_object()
 
         if task.status not in (Task.Status.PENDING, Task.Status.ASSIGNED):
-            return Response(
-                {"error": {
-                    "code": "INVALID_STATE",
-                    "message": f"Cannot assign task with status {task.status}.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
+            raise InvalidStateError(f"Cannot assign task with status {task.status}.")
 
         user_id = request.data.get("user_id")
         try:
             worker = User.objects.get(pk=user_id, role=User.Role.WORKER, is_active=True)
         except User.DoesNotExist:
-            return Response(
-                {"error": {"code": "NOT_FOUND", "message": "Active worker not found."}},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            raise NotFoundError("Active worker not found.")
 
         task.assignee = worker
         task.status = Task.Status.ASSIGNED
@@ -120,13 +106,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         task = self.get_object()
 
         if task.status != Task.Status.ASSIGNED:
-            return Response(
-                {"error": {
-                    "code": "INVALID_STATE",
-                    "message": f"Cannot start task with status {task.status}.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
+            raise InvalidStateError(f"Cannot start task with status {task.status}.")
 
         task.status = Task.Status.IN_PROGRESS
         task.save(update_fields=["status"])
@@ -137,13 +117,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         task = self.get_object()
 
         if task.status != Task.Status.IN_PROGRESS:
-            return Response(
-                {"error": {
-                    "code": "INVALID_STATE",
-                    "message": f"Cannot complete task with status {task.status}.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
+            raise InvalidStateError(f"Cannot complete task with status {task.status}.")
 
         task.status = Task.Status.DONE
         task.completed_at = timezone.now()
@@ -155,13 +129,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         task = self.get_object()
 
         if task.status == Task.Status.DONE:
-            return Response(
-                {"error": {
-                    "code": "INVALID_STATE",
-                    "message": "Cannot cancel completed task.",
-                }},
-                status=status.HTTP_409_CONFLICT,
-            )
+            raise InvalidStateError("Cannot cancel completed task.")
 
         task.status = Task.Status.CANCELLED
         task.save(update_fields=["status"])
