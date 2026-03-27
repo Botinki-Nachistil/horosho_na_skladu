@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from accounts.models import User
 from orders.models import Order
-from orders.serializers import OrderSerializer
+from orders.serializers import OrderSerializer, OrderTransitionSerializer
 from orders.services import transition_order
 
 
@@ -38,5 +38,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="transition")
     def transition(self, request, pk=None):
-        order = transition_order(self.get_object(), request.data.get("status"))
+        serializer = OrderTransitionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        order = transition_order(self.get_object(), serializer.validated_data["status"])
         return Response(OrderSerializer(order).data)

@@ -19,7 +19,9 @@ from operations.serializers import (
     IntegrationLogSerializer,
     KpiSnapshotSerializer,
     RouteSerializer,
+    TaskAssignSerializer,
     TaskSerializer,
+    TaskWriteSerializer,
     WaveSerializer,
 )
 from operations.services import (
@@ -55,8 +57,12 @@ class WaveViewSet(viewsets.ModelViewSet):
 
 
 class TaskViewSet(viewsets.ModelViewSet):
-    serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action in ("create", "update", "partial_update"):
+            return TaskWriteSerializer
+        return TaskSerializer
 
     def get_queryset(self):
         user = self.request.user
@@ -88,7 +94,9 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="assign")
     def assign(self, request, pk=None):
-        task = assign_task(self.get_object(), request.data.get("user_id"))
+        serializer = TaskAssignSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        task = assign_task(self.get_object(), serializer.validated_data["user_id"])
         return Response(TaskSerializer(task).data)
 
     @action(detail=True, methods=["post"], url_path="start")

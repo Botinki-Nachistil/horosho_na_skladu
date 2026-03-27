@@ -9,7 +9,7 @@ class OrderLineSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderLine
         fields = ["id", "order", "item", "location", "qty_req", "qty_picked"]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "qty_picked"]
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -31,7 +31,11 @@ class OrderSerializer(serializers.ModelSerializer):
             "lines",
             "available_transitions",
         ]
-        read_only_fields = ["id", "created_at", "updated_at", "lines", "available_transitions"]
+        read_only_fields = ["id", "status", "created_at", "updated_at", "lines", "available_transitions"]
 
     def get_available_transitions(self, obj: Order) -> list[str]:
         return [s for s in Order.Status.values if obj.can_transition_to(s)]
+
+
+class OrderTransitionSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=Order.Status.choices)

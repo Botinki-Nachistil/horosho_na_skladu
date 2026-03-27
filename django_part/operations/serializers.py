@@ -53,7 +53,25 @@ class TaskSerializer(serializers.ModelSerializer):
             "completed_at",
             "steps",
         ]
-        read_only_fields = ["id", "created_at", "steps"]
+        read_only_fields = ["id", "status", "assignee", "assigned_at", "completed_at", "created_at", "steps"]
+
+
+class TaskWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = [
+            "warehouse",
+            "wave",
+            "task_type",
+            "source_location",
+            "target_location",
+            "quantity",
+            "priority",
+        ]
+
+
+class TaskAssignSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
 
 
 class WaveSerializer(serializers.ModelSerializer):
@@ -62,10 +80,10 @@ class WaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wave
         fields = ["id", "warehouse", "code", "status", "scheduled_at", "created_at", "tasks_count"]
-        read_only_fields = ["id", "created_at"]
+        read_only_fields = ["id", "status", "created_at"]
 
     def get_tasks_count(self, instance: Wave) -> int:
-        return instance.tasks.count()
+        return len(instance.tasks.all())
 
 
 class RouteSerializer(serializers.ModelSerializer):

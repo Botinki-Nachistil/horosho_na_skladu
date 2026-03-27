@@ -8,13 +8,8 @@ from accounts.models import AuditLog, RBACPermission, RefreshToken, User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    pin = serializers.CharField(
-        write_only=True,
-        required=False,
-        allow_blank=True,
-        style={"input_type": "password"},
-    )
-    warehouse = serializers.PrimaryKeyRelatedField(read_only=True)
+    """Read-only serializer — returned in all responses."""
+    warehouse_name = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -26,29 +21,30 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "role",
             "warehouse",
+            "warehouse_name",
             "shift",
             "is_active",
             "date_joined",
-            "pin",
         ]
-        read_only_fields = ["id", "date_joined"]
-        extra_kwargs = {"password": {"write_only": True, "required": False}}
+        read_only_fields = [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "role",
+            "warehouse",
+            "shift",
+            "is_active",
+            "date_joined",
+        ]
 
-    def validate_pin(self, value: str) -> str:
-        if value and not re.match(r"^\d{4,6}$", value):
-            raise serializers.ValidationError("PIN must contain 4-6 digits.")
-        return value
-
-    def update(self, instance: User, validated_data: dict) -> User:
-        pin = validated_data.pop("pin", None)
-        instance = super().update(instance, validated_data)
-        if pin:
-            instance.set_pin(pin)
-            instance.save(update_fields=["pin_code"])
-        return instance
+    def get_warehouse_name(self, obj: User) -> str | None:
+        return obj.warehouse.name if obj.warehouse_id else None
 
 
 class UserCreateSerializer(serializers.Serializer):
+    """Input for POST /users/ — validated data is passed to create_user() service."""
     username = serializers.CharField(max_length=150)
     password = serializers.CharField(write_only=True, style={"input_type": "password"})
     role = serializers.ChoiceField(choices=User.Role.choices)
@@ -66,6 +62,14 @@ class UserCreateSerializer(serializers.Serializer):
         if value and not re.match(r"^\d{4,6}$", value):
             raise serializers.ValidationError("PIN must contain 4-6 digits.")
         return value
+
+
+class UserUpdateSerializer(serializers.Serializer):
+    """Input for PATCH /users/{id}/ — only safe profile fields."""
+    first_name = serializers.CharField(max_length=150, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
+    email = serializers.EmailField(required=False)
+    shift = serializers.CharField(max_length=20, required=False, allow_blank=True)
 
 
 class ChangePasswordSerializer(serializers.Serializer):

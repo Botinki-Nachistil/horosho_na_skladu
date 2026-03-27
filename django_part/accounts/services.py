@@ -75,6 +75,16 @@ def create_user(
     return user
 
 
+def update_user(user: User, **fields) -> User:
+    allowed = {"first_name", "last_name", "email", "shift"}
+    update_fields = [k for k in fields if k in allowed]
+    for k in update_fields:
+        setattr(user, k, fields[k])
+    if update_fields:
+        user.save(update_fields=update_fields)
+    return user
+
+
 def change_password(user: User, old_password: str, new_password: str) -> User:
     if not user.check_password(old_password):
         raise ValidationError("Current password is incorrect.")

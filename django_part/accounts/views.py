@@ -13,6 +13,7 @@ from accounts.serializers import (
     ChangePasswordSerializer,
     UserCreateSerializer,
     UserSerializer,
+    UserUpdateSerializer,
 )
 from accounts.services import (
     change_password,
@@ -21,6 +22,7 @@ from accounts.services import (
     pin_login,
     refresh_token,
     set_user_active,
+    update_user,
 )
 
 
@@ -85,6 +87,13 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsSupervisor]
     serializer_class = UserSerializer
 
+    def get_serializer_class(self):
+        if self.action == "create":
+            return UserCreateSerializer
+        if self.action in ("update", "partial_update"):
+            return UserUpdateSerializer
+        return UserSerializer
+
     def get_queryset(self):
         user = self.request.user
         qs = User.objects.select_related("warehouse").order_by("id")
@@ -111,6 +120,17 @@ class UserViewSet(viewsets.ModelViewSet):
             pin=d.get("pin") or None,
         )
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        serializer = UserUpdateSerializer(data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        user = update_user(self.get_object(), **serializer.validated_data)
+        return Response(UserSerializer(user).data)
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs["partial"] = True
+        return self.update(request, *args, **kwargs)
 
     @action(detail=True, methods=["post"], url_path="deactivate", permission_classes=[IsAdmin])
     def deactivate(self, request, pk=None):
