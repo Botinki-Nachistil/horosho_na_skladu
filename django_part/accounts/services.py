@@ -3,8 +3,14 @@ from __future__ import annotations
 from django.contrib.auth import authenticate
 
 from accounts.models import User
-from shared.exceptions import TokenValidationError, ValidationError
+from shared.exceptions import PermissionDeniedError, TokenValidationError, ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
+
+_ALLOWED_ROLE_CREATION: dict[str, list[str]] = {
+    User.Role.ADMIN: [User.Role.MANAGER, User.Role.SUPERVISOR, User.Role.WORKER],
+    User.Role.MANAGER: [User.Role.SUPERVISOR, User.Role.WORKER],
+    User.Role.SUPERVISOR: [User.Role.WORKER],
+}
 
 
 def login_user(username: str | None, password: str | None, request) -> dict:
@@ -38,6 +44,43 @@ def refresh_token(token: str | None) -> dict:
         return {"access": str(refresh.access_token)}
     except Exception:
         raise TokenValidationError("Token is invalid or expired.")
+
+
+def create_user(
+    creator: User,
+    username: str,
+    role: str,
+    warehouse_id: int,
+    password: str,
+    first_name: str = "",
+    last_name: str = "",
+    pin: str | None = None,
+) -> User:
+    allowed = _ALLOWED_ROLE_CREATION.get(creator.role, [])
+    if role not in allowed:
+        raise PermissionDeniedError(
+            f"Role '{creator.role}' cannot create users with role '{role}'."
+        )
+    user = User(
+        username=username,
+        role=role,
+        warehouse_id=warehouse_id,
+        first_name=first_name,
+        last_name=last_name,
+    )
+    user.set_password(password)
+    if pin:
+        user.set_pin(pin)
+    user.save()
+    return user
+
+
+def change_password(user: User, old_password: str, new_password: str) -> User:
+    if not user.check_password(old_password):
+        raise ValidationError("Current password is incorrect.")
+    user.set_password(new_password)
+    user.save(update_fields=["password"])
+    return user
 
 
 def set_user_active(user: User, is_active: bool) -> User:

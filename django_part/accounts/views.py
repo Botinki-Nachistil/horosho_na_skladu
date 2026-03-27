@@ -1,15 +1,27 @@
 from __future__ import annotations
 
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shared.exceptions import TokenValidationError, ValidationError
 from accounts.models import AuditLog, User
-from accounts.serializers import AuditLogSerializer, UserCreateSerializer, UserSerializer
-from accounts.services import login_user, pin_login, refresh_token, set_user_active
+from accounts.permissions import IsAdmin, IsSupervisor
+from accounts.serializers import (
+    AuditLogSerializer,
+    ChangePasswordSerializer,
+    UserCreateSerializer,
+    UserSerializer,
+)
+from accounts.services import (
+    change_password,
+    create_user,
+    login_user,
+    pin_login,
+    refresh_token,
+    set_user_active,
+)
 
 
 class LoginView(APIView):
@@ -55,23 +67,57 @@ class MeView(APIView):
         })
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        change_password(
+            user=request.user,
+            old_password=serializer.validated_data["old_password"],
+            new_password=serializer.validated_data["new_password"],
+        )
+        return Response({"message": "Password changed successfully."})
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsSupervisor]
+    serializer_class = UserSerializer
+
     def get_queryset(self):
-        return User.objects.select_related("warehouse").order_by("id")
+        user = self.request.user
+        qs = User.objects.select_related("warehouse").order_by("id")
+        if user.role == User.Role.ADMIN:
+            return qs
+        if user.role == User.Role.MANAGER:
+            return qs.filter(warehouse_id=user.warehouse_id).exclude(role=User.Role.ADMIN)
+        if user.role == User.Role.SUPERVISOR:
+            return qs.filter(warehouse_id=user.warehouse_id, role=User.Role.WORKER)
+        return qs.none()
 
-    def get_serializer_class(self):
-        if self.action == "create":
-            return UserCreateSerializer
-        return UserSerializer
+    def create(self, request):
+        serializer = UserCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        d = serializer.validated_data
+        user = create_user(
+            creator=request.user,
+            username=d["username"],
+            role=d["role"],
+            warehouse_id=d["warehouse_id"],
+            password=d["password"],
+            first_name=d.get("first_name", ""),
+            last_name=d.get("last_name", ""),
+            pin=d.get("pin") or None,
+        )
+        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=["post"], url_path="deactivate")
+    @action(detail=True, methods=["post"], url_path="deactivate", permission_classes=[IsAdmin])
     def deactivate(self, request, pk=None):
         set_user_active(self.get_object(), False)
         return Response({"message": "User deactivated."})
 
-    @action(detail=True, methods=["post"], url_path="activate")
+    @action(detail=True, methods=["post"], url_path="activate", permission_classes=[IsAdmin])
     def activate(self, request, pk=None):
         set_user_active(self.get_object(), True)
         return Response({"message": "User activated."})

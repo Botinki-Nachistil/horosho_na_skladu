@@ -48,21 +48,29 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class UserCreateSerializer(UserSerializer):
-    password = serializers.CharField(write_only=True, required=True, style={"input_type": "password"})
+class UserCreateSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True, style={"input_type": "password"})
+    role = serializers.ChoiceField(choices=User.Role.choices)
+    warehouse_id = serializers.IntegerField()
+    first_name = serializers.CharField(max_length=150, required=False, default="")
+    last_name = serializers.CharField(max_length=150, required=False, default="")
+    pin = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True,
+        style={"input_type": "password"},
+    )
 
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ["password"]
+    def validate_pin(self, value: str) -> str:
+        if value and not re.match(r"^\d{4,6}$", value):
+            raise serializers.ValidationError("PIN must contain 4-6 digits.")
+        return value
 
-    def create(self, validated_data: dict) -> User:
-        password = validated_data.pop("password")
-        pin = validated_data.pop("pin", None)
-        user = User(**validated_data)
-        user.set_password(password)
-        if pin:
-            user.set_pin(pin)
-        user.save()
-        return user
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True, style={"input_type": "password"})
+    new_password = serializers.CharField(write_only=True, min_length=8, style={"input_type": "password"})
 
 
 class RefreshTokenSerializer(serializers.ModelSerializer):

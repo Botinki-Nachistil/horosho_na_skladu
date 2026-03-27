@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from accounts.models import User
-from shared.exceptions import InvalidStateError, NotFoundError
 from operations.models import (
     IntegrationConfig,
     IntegrationLog,
@@ -37,7 +36,10 @@ class WaveViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        user = self.request.user
         qs = Wave.objects.select_related("warehouse").prefetch_related("tasks")
+        if user.role in (User.Role.MANAGER, User.Role.SUPERVISOR) and user.warehouse_id:
+            qs = qs.filter(warehouse_id=user.warehouse_id)
         warehouse_id = self.request.query_params.get("warehouse")
         status_param = self.request.query_params.get("status")
         if warehouse_id:
@@ -65,6 +67,8 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         if user.role == User.Role.WORKER:
             qs = qs.filter(assignee=user)
+        elif user.role in (User.Role.MANAGER, User.Role.SUPERVISOR) and user.warehouse_id:
+            qs = qs.filter(warehouse_id=user.warehouse_id)
 
         status_param = self.request.query_params.get("status")
         task_type = self.request.query_params.get("task_type")
