@@ -5,6 +5,7 @@ from rest_framework.routers import DefaultRouter
 
 from accounts.views import (
     AuditLogViewSet,
+    ChangePasswordView,
     LoginView,
     MeView,
     PinLoginView,
@@ -21,5 +22,6 @@ urlpatterns = [
     path("login/pin/", PinLoginView.as_view(), name="pin-login"),
     path("token/refresh/", RefreshView.as_view(), name="token-refresh"),
     path("me/", MeView.as_view(), name="me"),
+    path("me/change-password/", ChangePasswordView.as_view(), name="change-password"),
     path("", include(router.urls)),
 ]

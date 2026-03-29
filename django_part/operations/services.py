@@ -4,12 +4,14 @@ from django.utils import timezone
 
 from accounts.models import User
 from operations.models import Task, Wave
-from shared.exceptions import InvalidStateError, NotFoundError
+from shared.exceptions import InvalidStateError, NotFoundError, ValidationError
 
 
 def activate_wave(wave: Wave) -> Wave:
     if wave.status != Wave.Status.PLANNED:
         raise InvalidStateError(f"Cannot activate wave with status {wave.status}.")
+    if not wave.tasks.exists():
+        raise InvalidStateError("Cannot activate a wave with no tasks.")
     wave.status = Wave.Status.ACTIVE
     wave.save(update_fields=["status"])
     return wave
@@ -22,6 +24,8 @@ def assign_task(task: Task, user_id: int) -> Task:
         worker = User.objects.get(pk=user_id, role=User.Role.WORKER, is_active=True)
     except User.DoesNotExist:
         raise NotFoundError("Active worker not found.")
+    if worker.warehouse_id != task.warehouse_id:
+        raise ValidationError("Worker does not belong to the task's warehouse.")
     task.assignee = worker
     task.status = Task.Status.ASSIGNED
     task.assigned_at = timezone.now()

@@ -3,6 +3,7 @@ from __future__ import annotations
 from rest_framework import filters, viewsets
 from rest_framework.permissions import IsAuthenticated
 
+from accounts.models import User
 from warehouse.models import Location, Warehouse, Zone
 from warehouse.serializers import LocationSerializer, WarehouseSerializer, ZoneSerializer
 

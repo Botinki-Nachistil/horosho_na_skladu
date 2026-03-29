@@ -21,7 +21,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         return qs
 
 
-class InventoryViewSet(viewsets.ModelViewSet):
+class InventoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = InventorySerializer
     permission_classes = [IsAuthenticated]
 
