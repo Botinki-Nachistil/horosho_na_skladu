@@ -19,6 +19,7 @@ from accounts.services import (
     change_password,
     create_user,
     login_user,
+    logout_user,
     pin_login,
     refresh_token,
     set_user_active,
@@ -52,6 +53,14 @@ class RefreshView(APIView):
 
     def post(self, request):
         return Response(refresh_token(request.data.get("refresh")))
+
+
+class LogoutView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        logout_user(request.data.get("refresh"))
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class MeView(APIView):

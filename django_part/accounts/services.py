@@ -1,10 +1,15 @@
 from __future__ import annotations
 
-from django.contrib.auth import authenticate
+import uuid
+from datetime import datetime
+from datetime import timezone as dt_timezone
 
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from accounts.models import RefreshToken as RevokedToken
 from accounts.models import User
 from shared.exceptions import PermissionDeniedError, TokenValidationError, ValidationError
-from rest_framework_simplejwt.tokens import RefreshToken
 
 _ALLOWED_ROLE_CREATION: dict[str, list[str]] = {
     User.Role.ADMIN: [User.Role.MANAGER, User.Role.SUPERVISOR, User.Role.WORKER],
@@ -41,7 +46,28 @@ def refresh_token(token: str | None) -> dict:
         raise ValidationError("refresh token is required.")
     try:
         refresh = RefreshToken(token)
+        jti = uuid.UUID(refresh["jti"])
+        if RevokedToken.objects.filter(jti=jti, revoked=True).exists():
+            raise TokenValidationError("Token has been revoked.")
         return {"access": str(refresh.access_token)}
+    except TokenValidationError:
+        raise
+    except Exception:
+        raise TokenValidationError("Token is invalid or expired.")
+
+
+def logout_user(token_str: str | None) -> None:
+    if not token_str:
+        raise ValidationError("refresh token is required.")
+    try:
+        token = RefreshToken(token_str)
+        jti = uuid.UUID(token["jti"])
+        exp = datetime.fromtimestamp(token["exp"], tz=dt_timezone.utc)
+        user_id = token["user_id"]
+        RevokedToken.objects.update_or_create(
+            jti=jti,
+            defaults={"user_id": user_id, "exp": exp, "revoked": True},
+        )
     except Exception:
         raise TokenValidationError("Token is invalid or expired.")
 

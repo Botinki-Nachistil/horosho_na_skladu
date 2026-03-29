@@ -7,6 +7,7 @@ from accounts.views import (
     AuditLogViewSet,
     ChangePasswordView,
     LoginView,
+    LogoutView,
     MeView,
     PinLoginView,
     RefreshView,
@@ -20,6 +21,7 @@ router.register("audit", AuditLogViewSet, basename="audit")
 urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("login/pin/", PinLoginView.as_view(), name="pin-login"),
+    path("logout/", LogoutView.as_view(), name="logout"),
     path("token/refresh/", RefreshView.as_view(), name="token-refresh"),
     path("me/", MeView.as_view(), name="me"),
     path("me/change-password/", ChangePasswordView.as_view(), name="change-password"),
