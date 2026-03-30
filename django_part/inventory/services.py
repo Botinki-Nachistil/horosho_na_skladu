@@ -32,11 +32,12 @@ def release_inventory(item: Item, location: Location, qty) -> Inventory:
 
 
 def adjust_inventory(item: Item, location: Location, qty) -> Inventory:
-    inv, _ = Inventory.objects.get_or_create(
-        item=item,
-        location=location,
-        defaults={"quantity": 0, "reserved_qty": 0},
-    )
-    inv.quantity = qty
-    inv.save(update_fields=["quantity"])
-    return inv
+    with transaction.atomic():
+        inv, _ = Inventory.objects.select_for_update().get_or_create(
+            item=item,
+            location=location,
+            defaults={"quantity": 0, "reserved_qty": 0},
+        )
+        inv.quantity = qty
+        inv.save(update_fields=["quantity"])
+        return inv

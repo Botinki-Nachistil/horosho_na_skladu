@@ -27,9 +27,9 @@ def login_user(username: str | None, password: str | None, request) -> dict:
 def pin_login(pin: str | None, warehouse_id: int | None) -> dict:
     if not pin or not pin.isdigit() or not (4 <= len(pin) <= 6):
         raise ValidationError("PIN must be 4-6 digits.")
-    qs = User.objects.filter(role=User.Role.WORKER, is_active=True)
-    if warehouse_id:
-        qs = qs.filter(warehouse_id=warehouse_id)
+    if not warehouse_id:
+        raise ValidationError("warehouse_id is required.")
+    qs = User.objects.filter(role=User.Role.WORKER, is_active=True, warehouse_id=warehouse_id)
     matched = next((u for u in qs if u.check_pin(pin)), None)
     if not matched:
         raise TokenValidationError("Invalid PIN.")

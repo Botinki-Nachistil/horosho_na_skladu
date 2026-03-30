@@ -2,3 +2,8 @@ __pycache__/
 *.py[cod]
 *.sqlite3
 .DS_Store
+
+# Environment
+.env
+.env.*
+!.env.example
