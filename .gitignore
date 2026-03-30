@@ -1,9 +1,94 @@
+# Python bytecode
 __pycache__/
 *.py[cod]
+*$py.class
+
+# Python packaging
+.Python
+build/
+dist/
+downloads/
+.eggs/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+share/python-wheels/
+var/
+wheels/
+*.egg
+*.egg-info/
+.installed.cfg
+pip-wheel-metadata/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Test, coverage, and analysis
+.coverage
+.coverage.*
+.hypothesis/
+.nox/
+.pytest_cache/
+.tox/
+.cache/
+coverage.xml
+htmlcov/
+nosetests.xml
+*.cover
+*.py,cover
+
+# Type checkers and linters
+.dmypy.json
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+dmypy.json
+
+# Logs and runtime files
+*.err
+*.log
+*.out
+*.pid
+*.pid.lock
+*.seed
+celerybeat.pid
+celerybeat-schedule
+
+# Local databases
+*.db
 *.sqlite3
+*.sqlite3-journal
+
+# Django / Flask / FastAPI local artifacts
+instance/
+local_settings.py
+media/
+staticfiles/
+webassets-cache/
+
+# Documentation and notebooks
+docs/_build/
+site/
+.ipynb_checkpoints/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+
+# OS files
 .DS_Store
+Thumbs.db
 
 # Environment
 .env
 .env.*
 !.env.example
+!.env.*.example
