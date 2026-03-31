@@ -4,6 +4,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from operations.views import (
+    EventViewSet,
     IntegrationConfigViewSet,
     IntegrationLogViewSet,
     KpiSnapshotViewSet,
@@ -19,6 +20,7 @@ router.register("routes", RouteViewSet, basename="route")
 router.register("integrations", IntegrationConfigViewSet, basename="integration-config")
 router.register("integration-logs", IntegrationLogViewSet, basename="integration-log")
 router.register("kpi", KpiSnapshotViewSet, basename="kpi")
+router.register("events", EventViewSet, basename="event")
 
 urlpatterns = [
     path("", include(router.urls)),

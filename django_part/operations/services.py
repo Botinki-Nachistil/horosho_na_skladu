@@ -24,8 +24,8 @@ def assign_task(task: Task, user_id: int) -> Task:
         worker = User.objects.get(pk=user_id, role=User.Role.WORKER, is_active=True)
     except User.DoesNotExist:
         raise NotFoundError("Active worker not found.")
-    if worker.warehouse_id != task.warehouse_id:
-        raise ValidationError("Worker does not belong to the task's warehouse.")
+    if task.warehouse_id not in worker.accessible_warehouse_ids:
+        raise ValidationError("Worker does not have access to the task's warehouse.")
     task.assignee = worker
     task.status = Task.Status.ASSIGNED
     task.assigned_at = timezone.now()
@@ -47,7 +47,22 @@ def complete_task(task: Task) -> Task:
     task.status = Task.Status.DONE
     task.completed_at = timezone.now()
     task.save(update_fields=["status", "completed_at"])
+    _try_complete_wave(task)
     return task
+
+
+def _try_complete_wave(task: Task) -> None:
+    if not task.wave_id:
+        return
+    wave = task.wave
+    if wave.status != Wave.Status.ACTIVE:
+        return
+    has_incomplete = wave.tasks.exclude(
+        status__in=(Task.Status.DONE, Task.Status.CANCELLED)
+    ).exists()
+    if not has_incomplete:
+        wave.status = Wave.Status.DONE
+        wave.save(update_fields=["status"])
 
 
 def cancel_task(task: Task) -> Task:
@@ -55,4 +70,5 @@ def cancel_task(task: Task) -> Task:
         raise InvalidStateError("Cannot cancel completed task.")
     task.status = Task.Status.CANCELLED
     task.save(update_fields=["status"])
+    _try_complete_wave(task)
     return task

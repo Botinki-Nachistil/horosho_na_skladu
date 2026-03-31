@@ -11,6 +11,16 @@ class ItemSerializer(serializers.ModelSerializer):
         fields = ["id", "sku", "name", "barcode", "unit", "weight", "dimensions", "is_active"]
         read_only_fields = ["id"]
 
+    def validate_dimensions(self, value: dict) -> dict:
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("dimensions must be a JSON object.")
+        for key, val in value.items():
+            if not isinstance(val, (int, float)):
+                raise serializers.ValidationError(
+                    f"dimensions['{key}'] must be a number, got {type(val).__name__}."
+                )
+        return value
+
 
 class InventorySerializer(serializers.ModelSerializer):
     item_sku = serializers.CharField(source="item.sku", read_only=True)

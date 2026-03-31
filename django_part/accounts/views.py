@@ -16,11 +16,13 @@ from accounts.serializers import (
     UserUpdateSerializer,
 )
 from accounts.services import (
+    add_warehouse_access,
     change_password,
     create_user,
     login_user,
     pin_login,
     refresh_token,
+    remove_warehouse_access,
     set_user_active,
     update_user,
 )
@@ -34,6 +36,7 @@ class LoginView(APIView):
             request.data.get("username"),
             request.data.get("password"),
             request,
+            warehouse_id=request.data.get("warehouse_id"),
         ))
 
 
@@ -65,6 +68,7 @@ class MeView(APIView):
             "full_name": u.get_full_name(),
             "role": u.role,
             "warehouse_id": u.warehouse_id,
+            "accessible_warehouses": u.accessible_warehouse_ids,
             "shift": u.shift,
         })
 
@@ -96,13 +100,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        qs = User.objects.select_related("warehouse").order_by("id")
+        qs = User.objects.select_related("warehouse").prefetch_related("warehouses").order_by("id")
         if user.role == User.Role.ADMIN:
             return qs
         if user.role == User.Role.MANAGER:
-            return qs.filter(warehouse_id=user.warehouse_id).exclude(role=User.Role.ADMIN)
+            return qs.filter(warehouse_id__in=user.accessible_warehouse_ids).exclude(role=User.Role.ADMIN)
         if user.role == User.Role.SUPERVISOR:
-            return qs.filter(warehouse_id=user.warehouse_id, role=User.Role.WORKER)
+            return qs.filter(warehouse_id__in=user.accessible_warehouse_ids, role=User.Role.WORKER)
         return qs.none()
 
     def create(self, request):
@@ -132,6 +136,22 @@ class UserViewSet(viewsets.ModelViewSet):
         kwargs["partial"] = True
         return self.update(request, *args, **kwargs)
 
+    @action(detail=True, methods=["post"], url_path="warehouses/add", permission_classes=[IsAdmin])
+    def add_warehouse(self, request, pk=None):
+        warehouse_id = request.data.get("warehouse_id")
+        if not warehouse_id:
+            return Response({"error": "warehouse_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+        add_warehouse_access(self.get_object(), warehouse_id)
+        return Response({"message": "Warehouse access granted."})
+
+    @action(detail=True, methods=["post"], url_path="warehouses/remove", permission_classes=[IsAdmin])
+    def remove_warehouse(self, request, pk=None):
+        warehouse_id = request.data.get("warehouse_id")
+        if not warehouse_id:
+            return Response({"error": "warehouse_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+        remove_warehouse_access(self.get_object(), warehouse_id)
+        return Response({"message": "Warehouse access revoked."})
+
     @action(detail=True, methods=["post"], url_path="deactivate", permission_classes=[IsAdmin])
     def deactivate(self, request, pk=None):
         set_user_active(self.get_object(), False)
@@ -145,7 +165,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AuditLogSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsManager]
 
     def get_queryset(self):
         qs = AuditLog.objects.select_related("user").order_by("-created_at")

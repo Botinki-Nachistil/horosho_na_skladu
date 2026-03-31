@@ -3,7 +3,7 @@ from __future__ import annotations
 from django.contrib.auth import authenticate
 
 from accounts.models import User
-from shared.exceptions import PermissionDeniedError, TokenValidationError, ValidationError
+from shared.exceptions import NotFoundError, PermissionDeniedError, TokenValidationError, ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 _ALLOWED_ROLE_CREATION: dict[str, list[str]] = {
@@ -13,7 +13,7 @@ _ALLOWED_ROLE_CREATION: dict[str, list[str]] = {
 }
 
 
-def login_user(username: str | None, password: str | None, request) -> dict:
+def login_user(username: str | None, password: str | None, request, warehouse_id: int | None = None) -> dict:
     if not username or not password:
         raise ValidationError("username and password are required.")
     user = authenticate(request, username=username, password=password)
@@ -21,7 +21,12 @@ def login_user(username: str | None, password: str | None, request) -> dict:
         raise TokenValidationError("Invalid username or password.")
     if not user.is_active:
         raise TokenValidationError("Account is disabled.")
-    return _make_token_response(user)
+    active_warehouse_id = user.warehouse_id
+    if warehouse_id:
+        if warehouse_id not in user.accessible_warehouse_ids:
+            raise ValidationError("User does not have access to this warehouse.")
+        active_warehouse_id = warehouse_id
+    return _make_token_response(user, active_warehouse_id)
 
 
 def pin_login(pin: str | None, warehouse_id: int | None) -> dict:
@@ -29,11 +34,17 @@ def pin_login(pin: str | None, warehouse_id: int | None) -> dict:
         raise ValidationError("PIN must be 4-6 digits.")
     if not warehouse_id:
         raise ValidationError("warehouse_id is required.")
-    qs = User.objects.filter(role=User.Role.WORKER, is_active=True, warehouse_id=warehouse_id)
-    matched = next((u for u in qs if u.check_pin(pin)), None)
-    if not matched:
+    lookup = User._pin_lookup_hash(warehouse_id, pin)
+    try:
+        user = User.objects.get(
+            pin_lookup=lookup,
+            warehouse_id=warehouse_id,
+            role=User.Role.WORKER,
+            is_active=True,
+        )
+    except User.DoesNotExist:
         raise TokenValidationError("Invalid PIN.")
-    return _make_token_response(matched)
+    return _make_token_response(user, warehouse_id)
 
 
 def refresh_token(token: str | None) -> dict:
@@ -93,20 +104,41 @@ def change_password(user: User, old_password: str, new_password: str) -> User:
     return user
 
 
+def add_warehouse_access(user: User, warehouse_id: int) -> User:
+    from warehouse.models import Warehouse
+    try:
+        warehouse = Warehouse.objects.get(pk=warehouse_id)
+    except Warehouse.DoesNotExist:
+        raise NotFoundError("Warehouse not found.")
+    if warehouse_id == user.warehouse_id:
+        raise ValidationError("This is already the user's home warehouse.")
+    user.warehouses.add(warehouse)
+    return user
+
+
+def remove_warehouse_access(user: User, warehouse_id: int) -> User:
+    if warehouse_id == user.warehouse_id:
+        raise ValidationError("Cannot remove access to the user's home warehouse.")
+    user.warehouses.remove(warehouse_id)
+    return user
+
+
 def set_user_active(user: User, is_active: bool) -> User:
     user.is_active = is_active
     user.save(update_fields=["is_active"])
     return user
 
 
-def _make_token_response(user: User) -> dict:
+def _make_token_response(user: User, warehouse_id: int | None = None) -> dict:
+    wid = warehouse_id or user.warehouse_id
     refresh = RefreshToken.for_user(user)
     refresh["role"] = user.role
-    refresh["warehouse_id"] = user.warehouse_id
+    refresh["warehouse_id"] = wid
     return {
         "access": str(refresh.access_token),
         "refresh": str(refresh),
         "user_id": user.id,
         "role": user.role,
-        "warehouse_id": user.warehouse_id,
+        "warehouse_id": wid,
+        "accessible_warehouses": user.accessible_warehouse_ids,
     }

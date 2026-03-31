@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from accounts.models import User
+from accounts.permissions import IsManager, IsSupervisor
 from orders.models import Order
 from orders.serializers import OrderSerializer, OrderTransitionSerializer
 from orders.services import transition_order
@@ -13,18 +14,22 @@ from orders.services import transition_order
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["created_at", "priority", "deadline"]
     ordering = ["-created_at"]
 
+    def get_permissions(self):
+        if self.action in ("create", "update", "partial_update", "destroy"):
+            return [IsManager()]
+        if self.action == "transition":
+            return [IsSupervisor()]
+        return [IsAuthenticated()]
+
     def get_queryset(self):
         user = self.request.user
-        qs = Order.objects.select_related("warehouse", "wave").prefetch_related(
-            "lines__item",
-        )
-        if user.role in (User.Role.MANAGER, User.Role.SUPERVISOR, User.Role.WORKER) and user.warehouse_id:
-            qs = qs.filter(warehouse_id=user.warehouse_id)
+        qs = Order.objects.select_related("warehouse", "wave").prefetch_related("lines__item")
+        if user.role != User.Role.ADMIN:
+            qs = qs.filter(warehouse_id__in=user.accessible_warehouse_ids)
         status_param = self.request.query_params.get("status")
         priority = self.request.query_params.get("priority")
         warehouse_id = self.request.query_params.get("warehouse")
