@@ -10,6 +10,7 @@ from accounts.models import AuditLog, RBACPermission, RefreshToken, User
 class UserSerializer(serializers.ModelSerializer):
     """Read-only serializer — returned in all responses."""
     warehouse_name = serializers.SerializerMethodField()
+    accessible_warehouses = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -22,6 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
             "role",
             "warehouse",
             "warehouse_name",
+            "accessible_warehouses",
             "shift",
             "is_active",
             "date_joined",
@@ -41,6 +43,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_warehouse_name(self, obj: User) -> str | None:
         return obj.warehouse.name if obj.warehouse_id else None
+
+    def get_accessible_warehouses(self, obj: User) -> list[int]:
+        return obj.accessible_warehouse_ids
 
 
 class UserCreateSerializer(serializers.Serializer):

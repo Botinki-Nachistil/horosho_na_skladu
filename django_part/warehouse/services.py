@@ -19,3 +19,9 @@ def deactivate_location(location: Location) -> Location:
     location.is_active = False
     location.save(update_fields=["is_active"])
     return location
+
+
+def activate_location(location: Location) -> Location:
+    location.is_active = True
+    location.save(update_fields=["is_active"])
+    return location

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import uuid
 
 from django.contrib.auth.hashers import check_password, make_password
@@ -32,6 +33,17 @@ class User(AbstractUser):
         blank=True,
         help_text="4-6-digit PIN for quick mobile login",
     )
+    pin_lookup = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="SHA-256 lookup hash for fast PIN search",
+    )
+    warehouses = models.ManyToManyField(
+        "warehouse.Warehouse",
+        blank=True,
+        related_name="accessible_users",
+        help_text="Additional warehouses this user can work at",
+    )
     shift = models.CharField(
         max_length=20,
         blank=True,
@@ -42,19 +54,39 @@ class User(AbstractUser):
         db_table = schema_table("auth", "accounts_user")
         verbose_name = "user"
         verbose_name_plural = "users"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["warehouse", "pin_lookup"],
+                condition=models.Q(pin_lookup__gt=""),
+                name="user_warehouse_pin_lookup_uniq",
+            )
+        ]
+
+    @staticmethod
+    def _pin_lookup_hash(warehouse_id: int, raw_pin: str) -> str:
+        return hashlib.sha256(f"{warehouse_id}:{raw_pin}".encode()).hexdigest()
 
     def save(self, *args, **kwargs):
         if self.pin_code and self.pin_code.isdigit():
             pin_validator(self.pin_code)
+            self.pin_lookup = self._pin_lookup_hash(self.warehouse_id, self.pin_code)
             self.pin_code = make_password(self.pin_code)
         super().save(*args, **kwargs)
 
     def set_pin(self, raw_pin: str) -> None:
         pin_validator(raw_pin)
+        self.pin_lookup = self._pin_lookup_hash(self.warehouse_id, raw_pin)
         self.pin_code = make_password(raw_pin)
 
     def check_pin(self, raw_pin: str) -> bool:
         return bool(self.pin_code) and check_password(raw_pin, self.pin_code)
+
+    @property
+    def accessible_warehouse_ids(self) -> list[int]:
+        ids = list(self.warehouses.values_list("id", flat=True))
+        if self.warehouse_id and self.warehouse_id not in ids:
+            ids.insert(0, self.warehouse_id)
+        return ids
 
 
 class RefreshToken(models.Model):

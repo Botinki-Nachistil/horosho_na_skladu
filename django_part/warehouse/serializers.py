@@ -41,3 +41,13 @@ class LocationSerializer(serializers.ModelSerializer):
         model = Location
         fields = ["id", "zone_id", "zone", "barcode", "coords", "is_active"]
         read_only_fields = ["id", "zone"]
+
+    def validate_coords(self, value: dict) -> dict:
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("coords must be a JSON object.")
+        for key, val in value.items():
+            if not isinstance(val, (int, float)):
+                raise serializers.ValidationError(
+                    f"coords['{key}'] must be a number, got {type(val).__name__}."
+                )
+        return value

@@ -26,18 +26,3 @@ class IsSupervisor(RolePermission):
 
 class IsWorker(RolePermission):
     required_roles = ["admin", "manager", "supervisor", "worker"]
-
-
-class WarehouseScopedPermission(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        user = request.user
-
-        if user.role in ("admin",):
-            return True
-
-        warehouse_id = getattr(obj, "warehouse_id", None)
-        if warehouse_id is None:
-            warehouse = getattr(obj, "warehouse", None)
-            warehouse_id = getattr(warehouse, "id", None)
-
-        return warehouse_id == user.warehouse_id
