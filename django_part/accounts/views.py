@@ -136,21 +136,18 @@ class UserViewSet(viewsets.ModelViewSet):
         kwargs["partial"] = True
         return self.update(request, *args, **kwargs)
 
-    @action(detail=True, methods=["post"], url_path="warehouses/add", permission_classes=[IsAdmin])
+    @action(detail=True, methods=["post"], url_path="warehouses", permission_classes=[IsAdmin])
     def add_warehouse(self, request, pk=None):
         warehouse_id = request.data.get("warehouse_id")
         if not warehouse_id:
             return Response({"error": "warehouse_id is required."}, status=status.HTTP_400_BAD_REQUEST)
         add_warehouse_access(self.get_object(), warehouse_id)
-        return Response({"message": "Warehouse access granted."})
+        return Response({"message": "Warehouse access granted."}, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=["post"], url_path="warehouses/remove", permission_classes=[IsAdmin])
-    def remove_warehouse(self, request, pk=None):
-        warehouse_id = request.data.get("warehouse_id")
-        if not warehouse_id:
-            return Response({"error": "warehouse_id is required."}, status=status.HTTP_400_BAD_REQUEST)
-        remove_warehouse_access(self.get_object(), warehouse_id)
-        return Response({"message": "Warehouse access revoked."})
+    @action(detail=True, methods=["delete"], url_path=r"warehouses/(?P<warehouse_id>[^/.]+)", permission_classes=[IsAdmin])
+    def remove_warehouse(self, request, pk=None, warehouse_id=None):
+        remove_warehouse_access(self.get_object(), int(warehouse_id))
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["post"], url_path="deactivate", permission_classes=[IsAdmin])
     def deactivate(self, request, pk=None):
