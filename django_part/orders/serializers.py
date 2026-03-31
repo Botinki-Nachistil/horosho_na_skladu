@@ -11,6 +11,11 @@ class OrderLineSerializer(serializers.ModelSerializer):
         fields = ["id", "order", "item", "location", "qty_req", "qty_picked"]
         read_only_fields = ["id", "qty_picked"]
 
+    def validate_qty_req(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("qty_req must be greater than zero.")
+        return value
+
 
 class OrderSerializer(serializers.ModelSerializer):
     lines = OrderLineSerializer(many=True, read_only=True)

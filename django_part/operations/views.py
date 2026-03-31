@@ -34,6 +34,7 @@ from operations.services import (
     complete_task,
     start_task,
 )
+from shared.exceptions import InvalidStateError
 
 
 class WaveViewSet(viewsets.ModelViewSet):
@@ -58,6 +59,11 @@ class WaveViewSet(viewsets.ModelViewSet):
         if status_param:
             qs = qs.filter(status=status_param)
         return qs
+
+    def perform_destroy(self, instance):
+        if instance.status == Wave.Status.ACTIVE:
+            raise InvalidStateError("Cannot delete an active wave. Cancel all tasks first.")
+        instance.delete()
 
     @action(detail=True, methods=["post"], url_path="activate")
     def activate(self, request, pk=None):

@@ -12,9 +12,10 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = BaseUserAdmin.fieldsets + (
         (
             "Warehouse Access",
-            {"fields": ("role", "warehouse", "pin_code", "shift")},
+            {"fields": ("role", "warehouse", "warehouses", "shift")},
         ),
     )
+    filter_horizontal = ("warehouses",)
 
 
 @admin.register(RefreshToken)
