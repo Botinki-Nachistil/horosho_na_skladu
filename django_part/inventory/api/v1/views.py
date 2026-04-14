@@ -7,8 +7,8 @@ from rest_framework.response import Response
 
 from accounts.models import User
 from accounts.permissions import IsManager, IsSupervisor
+from inventory.api.v1.serializers import InventorySerializer, ItemSerializer
 from inventory.models import Inventory, Item
-from inventory.serializers import InventorySerializer, ItemSerializer
 from inventory.services import adjust_inventory
 
 

@@ -36,10 +36,16 @@ class OrderSerializer(serializers.ModelSerializer):
             "lines",
             "available_transitions",
         ]
-        read_only_fields = ["id", "status", "warehouse", "wave", "created_at", "updated_at", "lines", "available_transitions"]
+        read_only_fields = ["id", "status", "created_at", "updated_at", "lines", "available_transitions"]
 
     def get_available_transitions(self, obj: Order) -> list[str]:
         return [s for s in Order.Status.values if obj.can_transition_to(s)]
+
+
+class OrderWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ["warehouse", "wave", "priority", "customer", "deadline"]
 
 
 class OrderTransitionSerializer(serializers.Serializer):

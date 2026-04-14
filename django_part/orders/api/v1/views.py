@@ -7,16 +7,20 @@ from rest_framework.response import Response
 
 from accounts.models import User
 from accounts.permissions import IsManager, IsSupervisor
+from orders.api.v1.serializers import OrderSerializer, OrderTransitionSerializer, OrderWriteSerializer
 from orders.models import Order
-from orders.serializers import OrderSerializer, OrderTransitionSerializer
 from orders.services import transition_order
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    serializer_class = OrderSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["created_at", "priority", "deadline"]
     ordering = ["-created_at"]
+
+    def get_serializer_class(self):
+        if self.action in ("create", "update", "partial_update"):
+            return OrderWriteSerializer
+        return OrderSerializer
 
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):

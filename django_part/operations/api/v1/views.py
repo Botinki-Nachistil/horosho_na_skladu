@@ -7,16 +7,7 @@ from rest_framework.response import Response
 
 from accounts.models import User
 from accounts.permissions import IsAdmin, IsManager, IsSupervisor
-from operations.models import (
-    Event,
-    IntegrationConfig,
-    IntegrationLog,
-    KpiSnapshot,
-    Route,
-    Task,
-    Wave,
-)
-from operations.serializers import (
+from operations.api.v1.serializers import (
     EventSerializer,
     IntegrationConfigSerializer,
     IntegrationLogSerializer,
@@ -26,6 +17,15 @@ from operations.serializers import (
     TaskSerializer,
     TaskWriteSerializer,
     WaveSerializer,
+)
+from operations.models import (
+    Event,
+    IntegrationConfig,
+    IntegrationLog,
+    KpiSnapshot,
+    Route,
+    Task,
+    Wave,
 )
 from operations.services import (
     activate_wave,
