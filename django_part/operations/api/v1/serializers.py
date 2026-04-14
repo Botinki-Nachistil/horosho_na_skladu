@@ -83,7 +83,7 @@ class WaveSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "status", "created_at"]
 
     def get_tasks_count(self, instance: Wave) -> int:
-        return len(instance.tasks.all())
+        return instance.tasks.count()
 
 
 class RouteSerializer(serializers.ModelSerializer):

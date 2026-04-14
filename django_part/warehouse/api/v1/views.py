@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from accounts.models import User
 from accounts.permissions import IsManager
+from warehouse.api.v1.serializers import LocationSerializer, WarehouseSerializer, ZoneSerializer
 from warehouse.models import Location, Warehouse, Zone
-from warehouse.serializers import LocationSerializer, WarehouseSerializer, ZoneSerializer
 from warehouse.services import activate_location, deactivate_location
 
 

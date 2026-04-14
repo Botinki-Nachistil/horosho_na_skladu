@@ -14,7 +14,7 @@ class WarehouseSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at"]
 
     def get_zones_count(self, instance: Warehouse) -> int:
-        return len(instance.zones.all())
+        return instance.zones.count()
 
 
 class ZoneSerializer(serializers.ModelSerializer):

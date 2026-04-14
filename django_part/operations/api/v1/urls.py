@@ -3,7 +3,7 @@ from __future__ import annotations
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from operations.views import (
+from operations.api.v1.views import (
     EventViewSet,
     IntegrationConfigViewSet,
     IntegrationLogViewSet,

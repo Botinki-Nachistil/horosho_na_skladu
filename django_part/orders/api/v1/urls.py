@@ -3,11 +3,10 @@ from __future__ import annotations
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from inventory.views import InventoryViewSet, ItemViewSet
+from orders.api.v1.views import OrderViewSet
 
 router = DefaultRouter()
-router.register("items", ItemViewSet, basename="item")
-router.register("inventory", InventoryViewSet, basename="inventory")
+router.register("orders", OrderViewSet, basename="order")
 
 urlpatterns = [
     path("", include(router.urls)),

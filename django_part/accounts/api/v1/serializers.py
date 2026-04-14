@@ -8,7 +8,6 @@ from accounts.models import AuditLog, RBACPermission, RefreshToken, User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Read-only serializer — returned in all responses."""
     warehouse_name = serializers.SerializerMethodField()
     accessible_warehouses = serializers.SerializerMethodField()
 
@@ -49,7 +48,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.Serializer):
-    """Input for POST /users/ — validated data is passed to create_user() service."""
     username = serializers.CharField(max_length=150)
     password = serializers.CharField(write_only=True, style={"input_type": "password"})
     role = serializers.ChoiceField(choices=User.Role.choices)
@@ -70,7 +68,6 @@ class UserCreateSerializer(serializers.Serializer):
 
 
 class UserUpdateSerializer(serializers.Serializer):
-    """Input for PATCH /users/{id}/ — only safe profile fields."""
     first_name = serializers.CharField(max_length=150, required=False)
     last_name = serializers.CharField(max_length=150, required=False)
     email = serializers.EmailField(required=False)

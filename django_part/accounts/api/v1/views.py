@@ -6,15 +6,15 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.models import AuditLog, User
-from accounts.permissions import IsAdmin, IsSupervisor
-from accounts.serializers import (
+from accounts.api.v1.serializers import (
     AuditLogSerializer,
     ChangePasswordSerializer,
     UserCreateSerializer,
     UserSerializer,
     UserUpdateSerializer,
 )
+from accounts.models import AuditLog, User
+from accounts.permissions import IsAdmin, IsSupervisor
 from accounts.services import (
     add_warehouse_access,
     change_password,
@@ -89,7 +89,6 @@ class ChangePasswordView(APIView):
 
 class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsSupervisor]
-    serializer_class = UserSerializer
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -110,7 +109,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return qs.none()
 
     def create(self, request):
-        serializer = UserCreateSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
         user = create_user(
@@ -127,7 +126,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
-        serializer = UserUpdateSerializer(data=request.data, partial=partial)
+        serializer = self.get_serializer(data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         user = update_user(self.get_object(), **serializer.validated_data)
         return Response(UserSerializer(user).data)
@@ -162,7 +161,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AuditLogSerializer
-    permission_classes = [IsManager]
+    permission_classes = [IsAdmin]
 
     def get_queryset(self):
         qs = AuditLog.objects.select_related("user").order_by("-created_at")
