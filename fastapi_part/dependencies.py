@@ -3,9 +3,10 @@ from __future__ import annotations
 from typing import Annotated
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
+from redis.asyncio import Redis
 
 from config import Settings, get_settings
 
@@ -60,10 +61,6 @@ def require_role(*roles: str):
             )
         return user
     return _check
-
-
-from fastapi import Request
-from redis.asyncio import Redis
 
 
 async def get_redis(request: Request) -> Redis:
