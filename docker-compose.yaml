@@ -15,6 +15,34 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  fastapi:
+    build:
+      context: ./fastapi_part
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      POSTGRES_DSN: postgresql+asyncpg://warehouse:warehouse@postgres:5432/warehouse_db
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: jwt-secret-change-me-at-least-32-bytes
+      DEBUG: "false"
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./fastapi_part:/app
+
   django:
     build:
       context: ./django_part
