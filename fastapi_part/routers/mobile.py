@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends
@@ -12,6 +11,7 @@ from database import get_db
 from dependencies import TokenPayload, get_redis, require_role
 from schemas.mobile import ScanRequest, ScanResponse, TaskSummary
 from services import mobile_service
+from services.mobile_service import TaskCompletionEvent
 
 router = APIRouter(prefix="/mobile", tags=["mobile"])
 
@@ -28,7 +28,9 @@ async def my_tasks(user: WorkerUser, db: DB) -> list[TaskSummary]:
 
 @router.post("/tasks/{task_id}/accept", response_model=TaskSummary)
 async def accept_task(task_id: int, user: WorkerUser, db: DB) -> TaskSummary:
-    task = await mobile_service.accept_task(db, task_id, user.user_id)
+    task = await mobile_service.accept_task(
+        db, task_id, user.user_id, user.warehouse_id
+    )
     return TaskSummary.model_validate(task)
 
 
@@ -46,20 +48,18 @@ async def complete_task(
     redis: RedisClient,
     bg: BackgroundTasks,
 ) -> TaskSummary:
-    task = await mobile_service.complete_task(db, task_id, user.user_id)
-    if task.status == "done":
-        bg.add_task(
-            _publish_task_completed,
-            redis,
-            task_id,
-            user.user_id,
-            user.warehouse_id,
-            task.completed_at,
-        )
+    task, completion_event = await mobile_service.complete_task(
+        db, task_id, user.user_id
+    )
+    if completion_event is not None:
+        bg.add_task(_publish_task_completed, redis, completion_event)
     return TaskSummary.model_validate(task)
 
 
-@router.post("/tasks/{task_id}/steps/{step_seq}/verify-scan", response_model=ScanResponse)
+@router.post(
+    "/tasks/{task_id}/steps/{step_seq}/verify-scan",
+    response_model=ScanResponse,
+)
 async def verify_scan(
     task_id: int,
     step_seq: int,
@@ -69,32 +69,23 @@ async def verify_scan(
     redis: RedisClient,
     bg: BackgroundTasks,
 ) -> ScanResponse:
-    result = await mobile_service.verify_scan(
-        db, task_id, step_seq, user.user_id, body.scanned_barcode, body.scanned_qty
+    result, completion_event = await mobile_service.verify_scan(
+        db, task_id, step_seq, user.user_id, body.scanned_barcode, body.actual_qty
     )
-    if result.task_completed:
-        bg.add_task(
-            _publish_task_completed,
-            redis,
-            task_id,
-            user.user_id,
-            user.warehouse_id,
-            datetime.now(timezone.utc),
-        )
+    if completion_event is not None:
+        bg.add_task(_publish_task_completed, redis, completion_event)
     return result
 
 
 async def _publish_task_completed(
     redis: Redis,
-    task_id: int,
-    assignee_id: int,
-    warehouse_id: int | None,
-    completed_at: datetime | None,
+    event: TaskCompletionEvent,
 ) -> None:
     payload = json.dumps({
-        "task_id": task_id,
-        "assignee_id": assignee_id,
-        "warehouse_id": warehouse_id,
-        "completed_at": completed_at.isoformat() if completed_at else None,
+        "event_type": "task.completed",
+        "task_id": event.task_id,
+        "assignee_id": event.assignee_id,
+        "warehouse_id": event.warehouse_id,
+        "completed_at": event.completed_at.isoformat(),
     })
-    await redis.publish("task.completed", payload)
+    await redis.publish(f"task_updates:{event.warehouse_id}", payload)

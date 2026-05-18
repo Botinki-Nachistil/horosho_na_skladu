@@ -1,14 +1,36 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from exceptions import InvalidStateError, NotFoundError, PermissionDeniedError
-from models.sa_models import Location, Task, TaskStep
+from exceptions import (
+    DomainValidationError,
+    InvalidStateError,
+    NotFoundError,
+    PermissionDeniedError,
+)
+from models.sa_models import Task, TaskStep
 from schemas.mobile import ScanResponse, StepInfo
+
+LOCATION_ACTIONS = {
+    "scan_location",
+    "pick_location",
+    "put_location",
+    "scan-source",
+    "confirm-target",
+}
+
+
+@dataclass(frozen=True)
+class TaskCompletionEvent:
+    task_id: int
+    assignee_id: int | None
+    warehouse_id: int
+    completed_at: datetime
 
 
 async def get_my_tasks(db: AsyncSession, user_id: int) -> list[Task]:
@@ -23,8 +45,14 @@ async def get_my_tasks(db: AsyncSession, user_id: int) -> list[Task]:
     return list(result.scalars().all())
 
 
-async def accept_task(db: AsyncSession, task_id: int, user_id: int) -> Task:
-    task = await _get_task_or_404(db, task_id)
+async def accept_task(
+    db: AsyncSession,
+    task_id: int,
+    user_id: int,
+    warehouse_id: int | None,
+) -> Task:
+    task = await _get_task_or_404(db, task_id, for_update=True)
+    _check_warehouse(task, warehouse_id)
     if task.status != "pending":
         raise InvalidStateError(f"Task is '{task.status}', expected 'pending'")
     task.assignee_id = user_id
@@ -36,7 +64,7 @@ async def accept_task(db: AsyncSession, task_id: int, user_id: int) -> Task:
 
 
 async def start_task(db: AsyncSession, task_id: int, user_id: int) -> Task:
-    task = await _get_task_or_404(db, task_id)
+    task = await _get_task_or_404(db, task_id, for_update=True)
     _check_owner(task, user_id)
     if task.status != "assigned":
         raise InvalidStateError(f"Task is '{task.status}', expected 'assigned'")
@@ -46,18 +74,22 @@ async def start_task(db: AsyncSession, task_id: int, user_id: int) -> Task:
     return task
 
 
-async def complete_task(db: AsyncSession, task_id: int, user_id: int) -> Task:
-    task = await _get_task_or_404(db, task_id)
+async def complete_task(
+    db: AsyncSession,
+    task_id: int,
+    user_id: int,
+) -> tuple[Task, TaskCompletionEvent | None]:
+    task = await _get_task_or_404(db, task_id, for_update=True)
     _check_owner(task, user_id)
     if task.status == "done":
-        return task
+        return task, None
     if task.status != "in_progress":
         raise InvalidStateError(f"Task is '{task.status}', expected 'in_progress'")
     task.status = "done"
     task.completed_at = datetime.now(timezone.utc)
     await db.commit()
     await db.refresh(task)
-    return task
+    return task, _completion_event(task)
 
 
 async def verify_scan(
@@ -66,9 +98,9 @@ async def verify_scan(
     step_seq: int,
     user_id: int,
     scanned_barcode: str,
-    scanned_qty: Decimal,
-) -> ScanResponse:
-    task = await _get_task_or_404(db, task_id)
+    actual_qty: Decimal,
+) -> tuple[ScanResponse, TaskCompletionEvent | None]:
+    task = await _get_task_or_404(db, task_id, for_update=True)
     _check_owner(task, user_id)
     if task.status != "in_progress":
         raise InvalidStateError("Task must be in_progress to verify scans")
@@ -84,51 +116,40 @@ async def verify_scan(
     if step.completed_at is not None:
         raise InvalidStateError("Step already completed")
 
-    if step.location_id is not None:
-        loc_result = await db.execute(
-            select(Location).where(Location.id == step.location_id)
-        )
-        location = loc_result.scalar_one_or_none()
-        if location is None:
-            raise NotFoundError(f"Location {step.location_id} not found")
-        expected_barcode = location.barcode
-        mismatch_type = "wrong_location"
-    else:
-        expected_barcode = step.expected_barcode
-        mismatch_type = "wrong_item"
-
-    if scanned_barcode != expected_barcode:
-        return ScanResponse(
-            ok=False,
-            step_completed=False,
-            mismatch_reason=mismatch_type,
-            next_step=None,
-            task_completed=False,
+    if scanned_barcode != step.expected_barcode:
+        return (
+            ScanResponse(
+                valid=False,
+                next_step=None,
+                mismatch_reason=_mismatch_reason_for_step(step),
+            ),
+            None,
         )
 
-    if step.expected_qty != Decimal("0") and scanned_qty != step.expected_qty:
-        return ScanResponse(
-            ok=False,
-            step_completed=False,
-            mismatch_reason="wrong_qty",
-            next_step=None,
-            task_completed=False,
+    if step.expected_qty != Decimal("0") and actual_qty != step.expected_qty:
+        return (
+            ScanResponse(
+                valid=False,
+                next_step=None,
+                mismatch_reason="wrong_qty",
+            ),
+            None,
         )
 
     now = datetime.now(timezone.utc)
-    step.actual_qty = scanned_qty
+    step.actual_qty = actual_qty
     step.completed_at = now
 
     await db.flush()
 
     remaining_result = await db.execute(
-        select(TaskStep).where(
+        select(TaskStep.id).where(
             TaskStep.task_id == task_id,
             TaskStep.completed_at.is_(None),
             TaskStep.sequence != step_seq,
-        )
+        ).limit(1)
     )
-    task_completed = remaining_result.scalar_one_or_none() is None
+    task_completed = remaining_result.first() is None
 
     if task_completed:
         task.status = "done"
@@ -156,16 +177,24 @@ async def verify_scan(
                 expected_qty=ns.expected_qty,
             )
 
-    return ScanResponse(
-        ok=True,
-        step_completed=True,
+    response = ScanResponse(
+        valid=True,
         next_step=next_step,
-        task_completed=task_completed,
+        mismatch_reason=None,
     )
+    return response, _completion_event(task) if task_completed else None
 
 
-async def _get_task_or_404(db: AsyncSession, task_id: int) -> Task:
-    result = await db.execute(select(Task).where(Task.id == task_id))
+async def _get_task_or_404(
+    db: AsyncSession,
+    task_id: int,
+    *,
+    for_update: bool = False,
+) -> Task:
+    stmt = select(Task).where(Task.id == task_id)
+    if for_update:
+        stmt = stmt.with_for_update()
+    result = await db.execute(stmt)
     task = result.scalar_one_or_none()
     if task is None:
         raise NotFoundError(f"Task {task_id} not found")
@@ -175,3 +204,25 @@ async def _get_task_or_404(db: AsyncSession, task_id: int) -> Task:
 def _check_owner(task: Task, user_id: int) -> None:
     if task.assignee_id != user_id:
         raise PermissionDeniedError("This task belongs to another worker")
+
+
+def _check_warehouse(task: Task, warehouse_id: int | None) -> None:
+    if warehouse_id is None or task.warehouse_id != warehouse_id:
+        raise PermissionDeniedError("This task belongs to another warehouse")
+
+
+def _completion_event(task: Task) -> TaskCompletionEvent:
+    if task.completed_at is None:
+        raise DomainValidationError("Completed task has no completed_at timestamp")
+    return TaskCompletionEvent(
+        task_id=task.id,
+        assignee_id=task.assignee_id,
+        warehouse_id=task.warehouse_id,
+        completed_at=task.completed_at,
+    )
+
+
+def _mismatch_reason_for_step(step: TaskStep) -> str:
+    if step.action in LOCATION_ACTIONS or step.location_id is not None:
+        return "wrong_location"
+    return "wrong_item"

@@ -97,7 +97,7 @@ async def test_accept_task(client: AsyncClient):
 
     assert response.status_code == 200
     assert response.json()["status"] == "assigned"
-    mock_accept.assert_awaited_once_with(ANY, 5, WORKER.user_id)
+    mock_accept.assert_awaited_once_with(ANY, 5, WORKER.user_id, WORKER.warehouse_id)
 
 
 @pytest.mark.asyncio
@@ -151,7 +151,7 @@ async def test_complete_task(client: AsyncClient):
     with patch(
         "routers.mobile.mobile_service.complete_task", new_callable=AsyncMock
     ) as mock_complete:
-        mock_complete.return_value = mock_task
+        mock_complete.return_value = mock_task, None
         response = await client.post("/api/v1/mobile/tasks/5/complete")
 
     assert response.status_code == 200
@@ -163,25 +163,23 @@ async def test_verify_scan_ok(client: AsyncClient):
     from schemas.mobile import ScanResponse, StepInfo
 
     scan_result = ScanResponse(
-        ok=True,
-        step_completed=True,
+        valid=True,
         next_step=StepInfo(sequence=2, action="confirm-target", expected_qty=Decimal("1.000")),
-        task_completed=False,
+        mismatch_reason=None,
     )
 
     with patch(
         "routers.mobile.mobile_service.verify_scan", new_callable=AsyncMock
     ) as mock_scan:
-        mock_scan.return_value = scan_result
+        mock_scan.return_value = scan_result, None
         response = await client.post(
             "/api/v1/mobile/tasks/5/steps/1/verify-scan",
-            json={"scanned_barcode": "LOC-001", "scanned_qty": "1.000"},
+            json={"scanned_barcode": "LOC-001", "actual_qty": "1.000"},
         )
 
     assert response.status_code == 200
     data = response.json()
-    assert data["ok"] is True
-    assert data["step_completed"] is True
+    assert data["valid"] is True
     assert data["next_step"]["sequence"] == 2
 
 
@@ -190,23 +188,21 @@ async def test_verify_scan_mismatch(client: AsyncClient):
     from schemas.mobile import ScanResponse
 
     scan_result = ScanResponse(
-        ok=False,
-        step_completed=False,
-        mismatch_reason="wrong_location",
+        valid=False,
         next_step=None,
-        task_completed=False,
+        mismatch_reason="wrong_location",
     )
 
     with patch(
         "routers.mobile.mobile_service.verify_scan", new_callable=AsyncMock
     ) as mock_scan:
-        mock_scan.return_value = scan_result
+        mock_scan.return_value = scan_result, None
         response = await client.post(
             "/api/v1/mobile/tasks/5/steps/1/verify-scan",
-            json={"scanned_barcode": "WRONG-BARCODE", "scanned_qty": "1.000"},
+            json={"scanned_barcode": "WRONG-BARCODE", "actual_qty": "1.000"},
         )
 
     assert response.status_code == 200
     data = response.json()
-    assert data["ok"] is False
+    assert data["valid"] is False
     assert data["mismatch_reason"] == "wrong_location"

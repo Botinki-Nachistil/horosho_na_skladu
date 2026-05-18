@@ -25,12 +25,10 @@ class StepInfo(BaseModel):
 
 class ScanRequest(BaseModel):
     scanned_barcode: str
-    scanned_qty: Decimal
+    actual_qty: Decimal
 
 
 class ScanResponse(BaseModel):
-    ok: bool
-    step_completed: bool
-    mismatch_reason: str | None = None
+    valid: bool
     next_step: StepInfo | None = None
-    task_completed: bool
+    mismatch_reason: str | None = None
