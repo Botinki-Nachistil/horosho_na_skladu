@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from redis.asyncio import Redis
 
 from config import get_settings
 from database import close_db, init_db
@@ -17,8 +18,10 @@ from routers.mobile import router as mobile_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    app.state.redis = Redis.from_url(get_settings().redis_url, decode_responses=True)
     yield
     await close_db()
+    await app.state.redis.aclose()
 
 
 app = FastAPI(
