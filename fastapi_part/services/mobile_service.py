@@ -89,7 +89,9 @@ async def verify_scan(
             select(Location).where(Location.id == step.location_id)
         )
         location = loc_result.scalar_one_or_none()
-        expected_barcode = location.barcode if location else step.expected_barcode
+        if location is None:
+            raise NotFoundError(f"Location {step.location_id} not found")
+        expected_barcode = location.barcode
         mismatch_type = "wrong_location"
     else:
         expected_barcode = step.expected_barcode
@@ -116,6 +118,8 @@ async def verify_scan(
     now = datetime.now(timezone.utc)
     step.actual_qty = scanned_qty
     step.completed_at = now
+
+    await db.flush()
 
     remaining_result = await db.execute(
         select(TaskStep).where(
