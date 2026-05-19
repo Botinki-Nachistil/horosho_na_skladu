@@ -43,6 +43,25 @@ services:
     volumes:
       - ./fastapi_part:/app
 
+  flask:
+    build:
+      context: ./flask_part
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      POSTGRES_DSN: postgresql://warehouse:warehouse@postgres:5432/warehouse_db
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: jwt-secret-change-me-at-least-32-bytes
+      DJANGO_API_URL: http://django:8001
+      DEBUG: "false"
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./flask_part:/app
+
   django:
     build:
       context: ./django_part

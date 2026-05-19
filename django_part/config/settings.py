@@ -107,6 +107,8 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
     "AUTH_HEADER_TYPES": ("Bearer",),
     "UPDATE_LAST_LOGIN": True,
+    "SIGNING_KEY": os.getenv("JWT_SECRET", "jwt-secret-change-me-at-least-32-bytes"),
+    "ALGORITHM": "HS256",
 }
 
 REST_FRAMEWORK = {
